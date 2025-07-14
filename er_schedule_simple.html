@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER Schedule Transformation</title>
+    
+    <!-- 부트스트랩 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 아이콘 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background-color: #495057;
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: bold;
+        }
+        
+        .data-input-area {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .data-input-area:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+        }
+        
+        .result-table {
+            font-size: 0.85em;
+        }
+        
+        .result-table th {
+            background-color: #495057;
+            color: white;
+            text-align: center;
+            font-size: 0.8em;
+            padding: 8px 4px;
+        }
+        
+        .result-table td {
+            text-align: center;
+            padding: 6px 4px;
+        }
+        
+        .weekend-row {
+            background-color: #fff3cd;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .stats-table {
+            font-size: 0.9em;
+        }
+        
+        .stats-table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            padding: 12px 8px;
+        }
+        
+        .stats-table td {
+            text-align: center;
+            padding: 10px 8px;
+            vertical-align: middle;
+        }
+        
+        .stats-table .doctor-name {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div class="header-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h1><i class="fas fa-calendar-alt"></i> ER Schedule Transformation</h1>
+                    <p class="lead">Emergency Room Schedule Data Processing System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 데이터 입력 섹션 -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-paste"></i> Schedule Data Input
+            </div>
+            <div class="card-body">
+                <textarea class="data-input-area w-100" id="schedule-data" 
+                          placeholder="Enter schedule data here...
+
+Format: Date|Day|D1|D2|MDH|MD|N1|N2
+
+Example:
+1|화|이||강|강|정|
+2|수|허||박|박|강|
+3|목|권||강|오|선|"></textarea>
+                
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary-custom btn-lg" onclick="processScheduleData()">
+                        <i class="fas fa-cogs"></i> Transform Data
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg ms-2" onclick="loadSampleData()">
+                        <i class="fas fa-flask"></i> Load Sample
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 결과 표시 섹션 -->
+        <div class="card" id="result-section" style="display: none;">
+            <div class="card-header">
+                <i class="fas fa-table"></i> Transformation Results
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered result-table" id="result-table">
+                        <!-- 결과 테이블이 여기에 생성됩니다 -->
+                    </table>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-success btn-lg" onclick="downloadExcel()">
+                        <i class="fas fa-download"></i> Download Excel
+                    </button>
+                    <button class="btn btn-info btn-lg ms-2" onclick="showWorkloadAnalysis()">
+                        <i class="fas fa-chart-bar"></i> Workload Analysis
+                    </button>
+                </div>
+                
+                <!-- 근무량 분석 섹션 -->
+                <div id="workload-analysis-section" style="display: none;">
+                    <hr class="my-4">
+                    <h5><i class="fas fa-chart-pie"></i> Staff Workload Analysis</h5>
+                    
+                    <div class="table-responsive mt-3">
+                        <table class="table table-bordered stats-table" id="workload-table">
+                            <thead>
+                                <tr>
+                                    <th>Staff Name</th>
+                                    <th>Day Shifts</th>
+                                    <th>MDH Shifts</th>
+                                    <th>MD Shifts</th>
+                                    <th>Night Shifts</th>
+                                    <th>Total Shifts</th>
+                                    <th>Workload %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="workload-table-body">
+                                <!-- JavaScript로 동적 생성 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 부트스트랩 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- 엑셀 생성 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        // 전역 변수
+        let scheduleData = {};
+        
+        // 의사명 매핑 (약어 → 풀네임)
+        const doctorNameMapping = {
+            '강': '강희동',
+            '오': '오세현',
+            '정': '정상구',
+            '이': '이유진',
+            '박': '박인준',
+            '권': '권재화',
+            '선': '선경민',
+            '허': '허석진',
+            '이2': '이기헌'
+        };
+
+        // 의사명 변환 함수
+        function convertDoctorName(shortName) {
+            const trimmed = shortName.trim();
+            return doctorNameMapping[trimmed] || trimmed;
+        }
+
+        // 샘플 데이터 로드
+        function loadSampleData() {
+            const sampleData = `1|화|이||강|강|정|
+2|수|허||박|박|강|
+3|목|권||강|오|선|
+4|금|오||박|박|허|
+5|토|선||강|강|권|
+6|일|박|이2|||허|이
+7|월|선||강|이2|이|`;
+
+            document.getElementById('schedule-data').value = sampleData;
+        }
+
+        // 스케줄 데이터 처리
+        function processScheduleData() {
+            const rawData = document.getElementById('schedule-data').value.trim();
+            
+            if (!rawData) {
+                alert('Please enter schedule data.');
+                return;
+            }
+
+            try {
+                scheduleData = parseScheduleData(rawData);
+                generateResultTable();
+                document.getElementById('result-section').style.display = 'block';
+                document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                alert('Error processing data: ' + error.message);
+            }
+        }
+
+        // 스케줄 데이터 파싱
+        function parseScheduleData(rawData) {
+            const lines = rawData.split('\n').filter(line => line.trim());
+            const parsedScheduleData = {};
+
+            lines.forEach((line, index) => {
+                try {
+                    const parts = line.split('|');
+                    
+                    if (parts.length < 8) {
+                        throw new Error(`Line ${index + 1}: Insufficient fields (${parts.length}/8)`);
+                    }
+
+                    const day = parseInt(parts[0]);
+                    if (isNaN(day) || day < 1 || day > 31) {
+                        throw new Error(`Line ${index + 1}: Invalid date (${parts[0]})`);
+                    }
+
+                    parsedScheduleData[day] = {
+                        date: `2025-07-${day.toString().padStart(2, '0')}`,
+                        day: parts[1].trim(),
+                        d1: convertDoctorName(parts[2]),
+                        d2: convertDoctorName(parts[3]),
+                        mdh: convertDoctorName(parts[4]),
+                        md: convertDoctorName(parts[5]),
+                        n1: convertDoctorName(parts[6]),
+                        n2: convertDoctorName(parts[7])
+                    };
+
+                } catch (error) {
+                    throw new Error(`Line ${index + 1} parsing error: ${error.message}`);
+                }
+            });
+
+            return parsedScheduleData;
+        }
+
+        // 결과 테이블 생성
+        function generateResultTable() {
+            const table = document.getElementById('result-table');
+            
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Day Shift 1</th>
+                        <th>Day Shift 2</th>
+                        <th>MDH Shift</th>
+                        <th>MD Shift</th>
+                        <th>Night Shift 1</th>
+                        <th>Night Shift 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            const sortedDays = Object.keys(scheduleData).sort((a, b) => parseInt(a) - parseInt(b));
+
+            sortedDays.forEach(day => {
+                const data = scheduleData[day];
+                const isWeekend = data.day === '토' || data.day === '일';
+                const rowClass = isWeekend ? 'weekend-row' : '';
+                
+                html += `
+                    <tr class="${rowClass}">
+                        <td><strong>${day}</strong></td>
+                        <td><strong>${data.day}</strong></td>
+                        <td>${data.d1 || ''}</td>
+                        <td>${data.d2 || ''}</td>
+                        <td>${data.mdh || ''}</td>
+                        <td>${data.md || ''}</td>
+                        <td>${data.n1 || ''}</td>
+                        <td>${data.n2 || ''}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        // 근무량 분석 표시
+        function showWorkloadAnalysis() {
+            if (!scheduleData || Object.keys(scheduleData).length === 0) {
+                alert('Please process schedule data first.');
+                return;
+            }
+
+            calculateWorkloadStats();
+            document.getElementById('workload-analysis-section').style.display = 'block';
+            document.getElementById('workload-analysis-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 근무량 통계 계산
+        function calculateWorkloadStats() {
+            const stats = {};
+            const staffList = Object.values(doctorNameMapping);
+            
+            // 통계 초기화
+            staffList.forEach(staff => {
+                stats[staff] = { d: 0, mdh: 0, md: 0, n: 0, total: 0 };
+            });
+
+            // 통계 계산
+            Object.values(scheduleData).forEach(day => {
+                if (day.d1 && stats[day.d1]) stats[day.d1].d++;
+                if (day.d2 && stats[day.d2]) stats[day.d2].d++;
+                if (day.mdh && stats[day.mdh]) stats[day.mdh].mdh++;
+                if (day.md && stats[day.md]) stats[day.md].md++;
+                if (day.n1 && stats[day.n1]) stats[day.n1].n++;
+                if (day.n2 && stats[day.n2]) stats[day.n2].n++;
+            });
+
+            // 총합 계산
+            const totalDays = Object.keys(scheduleData).length;
+            staffList.forEach(staff => {
+                stats[staff].total = stats[staff].d + stats[staff].mdh + stats[staff].md + stats[staff].n;
+            });
+
+            // 테이블 생성
+            const tableBody = document.getElementById('workload-table-body');
+            let html = '';
+
+            staffList.forEach(staff => {
+                const data = stats[staff];
+                if (data.total > 0) {
+                    const workloadPercent = Math.round((data.total / totalDays) * 100);
+                    
+                    html += `
+                        <tr>
+                            <td class="doctor-name">${staff}</td>
+                            <td>${data.d}</td>
+                            <td>${data.mdh}</td>
+                            <td>${data.md}</td>
+                            <td>${data.n}</td>
+                            <td><strong>${data.total}</strong></td>
+                            <td><strong>${workloadPercent}%</strong></td>
+                        </tr>
+                    `;
+                }
+            });
+
+            tableBody.innerHTML = html;
+        }
+
+        // 엑셀 파일 다운로드
+        function downloadExcel() {
+            if (!scheduleData || Object.keys(scheduleData).length === 0) {
+                alert('No data to download.');
+                return;
+            }
+
+            // 스케줄 데이터 준비
+            const scheduleExcelData = [];
+            scheduleExcelData.push(['Date', 'Day', 'Day Shift 1', 'Day Shift 2', 'MDH Shift', 'MD Shift', 'Night Shift 1', 'Night Shift 2']);
+
+            const sortedDays = Object.keys(scheduleData).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            sortedDays.forEach(day => {
+                const data = scheduleData[day];
+                scheduleExcelData.push([
+                    day,
+                    data.day,
+                    data.d1 || '',
+                    data.d2 || '',
+                    data.mdh || '',
+                    data.md || '',
+                    data.n1 || '',
+                    data.n2 || ''
+                ]);
+            });
+
+            // 근무량 통계 데이터 준비
+            const statsData = generateStatsData();
+            
+            // 엑셀 파일 생성
+            const wb = XLSX.utils.book_new();
+            
+            // 스케줄 시트
+            const ws1 = XLSX.utils.aoa_to_sheet(scheduleExcelData);
+            XLSX.utils.book_append_sheet(wb, ws1, "Schedule");
+            
+            // 통계 시트
+            const ws2 = XLSX.utils.aoa_to_sheet(statsData);
+            XLSX.utils.book_append_sheet(wb, ws2, "Workload Analysis");
+
+            // 파일 다운로드
+            const filename = `ER_Schedule_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        }
+
+        // 통계 데이터 생성
+        function generateStatsData() {
+            const stats = {};
+            const staffList = Object.values(doctorNameMapping);
+            
+            // 통계 초기화
+            staffList.forEach(staff => {
+                stats[staff] = { d: 0, mdh: 0, md: 0, n: 0, total: 0 };
+            });
+
+            // 통계 계산
+            Object.values(scheduleData).forEach(day => {
+                if (day.d1 && stats[day.d1]) stats[day.d1].d++;
+                if (day.d2 && stats[day.d2]) stats[day.d2].d++;
+                if (day.mdh && stats[day.mdh]) stats[day.mdh].mdh++;
+                if (day.md && stats[day.md]) stats[day.md].md++;
+                if (day.n1 && stats[day.n1]) stats[day.n1].n++;
+                if (day.n2 && stats[day.n2]) stats[day.n2].n++;
+            });
+
+            // 총합 계산
+            const totalDays = Object.keys(scheduleData).length;
+            staffList.forEach(staff => {
+                stats[staff].total = stats[staff].d + stats[staff].mdh + stats[staff].md + stats[staff].n;
+            });
+
+            // 통계 데이터 배열로 변환
+            const statsData = [];
+            statsData.push(['Staff Name', 'Day Shifts', 'MDH Shifts', 'MD Shifts', 'Night Shifts', 'Total Shifts', 'Workload %']);
+            
+            staffList.forEach(staff => {
+                const data = stats[staff];
+                if (data.total > 0) {
+                    const workloadPercent = Math.round((data.total / totalDays) * 100);
+                    statsData.push([staff, data.d, data.mdh, data.md, data.n, data.total, workloadPercent + '%']);
+                }
+            });
+
+            return statsData;
+        }
+
+        console.log('ER Schedule Transformation System Loaded');
+    </script>
+</body>
+</html>
