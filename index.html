@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>응급실 운영 모니터링 시스템 - 연구 데이터 공유 플랫폼</title>
+    <title>응급실 통합 모니터링 시스템 - 연구 논문용</title>
     
     <!-- 외부 라이브러리 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -24,10 +24,8 @@
             --dark-color: #1e293b;
             --light-color: #f1f5f9;
             --border-color: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --medical-blue: #667eea;
+            --medical-purple: #764ba2;
         }
 
         body {
@@ -39,12 +37,12 @@
         }
 
         /* ========================================
-           📦 MODULE: 헤더 스타일
+           📦 MODULE: 헤더 및 네비게이션
            ======================================== */
         .header-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            background: linear-gradient(135deg, var(--medical-blue) 0%, var(--medical-purple) 100%);
             color: white;
-            padding: 3rem 0;
+            padding: 2rem 0;
             margin-bottom: 2rem;
             text-align: center;
             position: relative;
@@ -70,37 +68,40 @@
         .header-section h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 0.5rem;
         }
 
         .header-section .lead {
-            font-size: 1.2rem;
-            font-weight: 400;
+            font-size: 1.1rem;
             opacity: 0.95;
-            margin-bottom: 1rem;
         }
 
-        /* ========================================
-           📦 MODULE: 공유 상태 알림
-           ======================================== */
-        .sharing-status {
-            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-            border: 2px solid #22c55e;
-            border-radius: 16px;
-            padding: 1.5rem;
+        /* 탭 네비게이션 */
+        .nav-tabs-custom {
+            border: none;
             margin-bottom: 2rem;
-            box-shadow: var(--shadow-md);
         }
 
-        .sharing-status.demo-mode {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-color: #f59e0b;
+        .nav-tabs-custom .nav-link {
+            border: none;
+            background: white;
+            color: var(--dark-color);
+            font-weight: 500;
+            padding: 1rem 2rem;
+            margin-right: 0.5rem;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s ease;
         }
 
-        .sharing-status.no-data {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border-color: #ef4444;
+        .nav-tabs-custom .nav-link:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            border-color: var(--primary-color);
         }
 
         /* ========================================
@@ -110,7 +111,7 @@
             background: white;
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             margin-bottom: 2rem;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -118,7 +119,7 @@
 
         .module-card:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-xl);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
 
         .module-header {
@@ -127,15 +128,9 @@
             padding: 1.5rem 2rem;
             font-weight: 600;
             font-size: 1.2em;
-            border-radius: 0;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-        }
-
-        .module-header i {
-            font-size: 1.3em;
-            opacity: 0.9;
         }
 
         .card-body {
@@ -143,118 +138,41 @@
         }
 
         /* ========================================
-           📦 MODULE: 버튼 스타일
+           📦 MODULE: 데이터 관리자 스타일
            ======================================== */
-        .btn-primary-academic {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-            border: none;
-            color: white;
-            font-weight: 500;
-            padding: 12px 28px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-md);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+        .data-manager {
+            background: var(--light-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .btn-primary-academic:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-lg);
-            color: white;
+        .data-list {
+            max-height: 300px;
+            overflow-y: auto;
         }
 
-        .btn-success-academic {
-            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
-            border: none;
-            color: white;
-            font-weight: 500;
-            padding: 12px 28px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-success-academic:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-lg);
-            color: white;
-        }
-
-        .btn-outline-primary {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            background: transparent;
-            border-radius: 10px;
-            font-weight: 500;
-            padding: 10px 26px;
+        .data-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .btn-outline-primary:hover {
+        .data-item:hover {
             background: var(--primary-color);
             color: white;
-            transform: translateY(-1px);
+            transform: translateX(5px);
         }
 
-        /* ========================================
-           📦 MODULE: 로딩 및 스피너
-           ======================================== */
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 3rem;
-            background: var(--light-color);
-            border-radius: 12px;
-            margin: 1.5rem 0;
-        }
-
-        .spinner-academic {
-            width: 50px;
-            height: 50px;
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ========================================
-           📦 MODULE: 데이터 테이블
-           ======================================== */
-        .data-table {
-            font-size: 0.9em;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-        }
-
-        .data-table th {
-            background: linear-gradient(135deg, var(--dark-color) 0%, #334155 100%);
+        .data-item.selected {
+            background: var(--success-color);
             color: white;
-            text-align: center;
-            font-size: 0.85em;
-            padding: 15px 12px;
-            font-weight: 600;
-            border: none;
-        }
-
-        .data-table td {
-            text-align: center;
-            padding: 12px;
-            vertical-align: middle;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .data-table tbody tr:hover {
-            background-color: var(--light-color);
+            border-color: var(--success-color);
         }
 
         /* ========================================
@@ -272,33 +190,10 @@
             overflow: hidden;
         }
 
-        .file-drop-area.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            border-color: #94a3b8;
-        }
-
-        .file-drop-area::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(37,99,235,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
-            opacity: 0.5;
-        }
-
-        .file-drop-area > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .file-drop-area:hover:not(.disabled) {
+        .file-drop-area:hover {
             border-color: var(--accent-color);
             background: linear-gradient(135deg, #e0f2fe 0%, #cffafe 100%);
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
         }
 
         .file-drop-area.drag-over {
@@ -306,110 +201,45 @@
             background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
         }
 
-        .file-drop-area h5 {
-            color: var(--dark-color);
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
         /* ========================================
-           📦 MODULE: 차트 컨테이너
+           📦 MODULE: 버튼 스타일
            ======================================== */
-        .chart-container {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-        }
-
-        .chart-container:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .chart-header {
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .chart-header::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: var(--accent-color);
-            border-radius: 2px;
-        }
-
-        .chart-header h5 {
-            color: var(--dark-color);
-            font-weight: 600;
-            margin: 0;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* ========================================
-           📦 MODULE: 통계 카드
-           ======================================== */
-        .stat-card {
+        .btn-primary-academic {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            border: none;
             color: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-            margin-bottom: 15px;
-            box-shadow: var(--shadow-lg);
+            font-weight: 500;
+            padding: 12px 28px;
+            border-radius: 10px;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            transform: translate(30px, -30px);
+        .btn-primary-academic:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            color: white;
         }
 
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-xl);
+        .btn-medical {
+            background: linear-gradient(45deg, var(--medical-blue), var(--medical-purple));
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
         }
 
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.95;
-            font-weight: 400;
-            position: relative;
-            z-index: 1;
+        .btn-medical:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
         }
 
         /* ========================================
-           📦 MODULE: 분석 버튼 그리드
+           📦 MODULE: 차트 분석 버튼 그리드
            ======================================== */
         .analysis-grid {
             display: grid;
@@ -428,7 +258,7 @@
             transition: all 0.3s ease;
             text-align: center;
             cursor: pointer;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             position: relative;
             overflow: hidden;
         }
@@ -453,7 +283,7 @@
             color: white;
             border-color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 8px 25px rgba(37,99,235,0.2);
         }
 
         .analysis-btn i {
@@ -466,6 +296,82 @@
         .analysis-btn small {
             opacity: 0.7;
             font-style: italic;
+        }
+
+        /* ========================================
+           📦 MODULE: 차트 컨테이너
+           ======================================== */
+        .chart-container {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .chart-header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .chart-header h5 {
+            color: var(--dark-color);
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ========================================
+           📦 MODULE: 스케줄 변환기 스타일
+           ======================================== */
+        .schedule-input-area {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            font-family: monospace;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .schedule-input-area:focus {
+            outline: none;
+            border-color: var(--medical-blue);
+            background: #fff;
+        }
+
+        .result-table {
+            font-size: 0.85em;
+        }
+
+        .result-table th {
+            background: linear-gradient(45deg, var(--medical-blue), var(--medical-purple));
+            color: white;
+            text-align: center;
+            font-size: 0.8em;
+            padding: 8px 4px;
+        }
+
+        .result-table td {
+            text-align: center;
+            padding: 6px 4px;
+        }
+
+        .weekend-row {
+            background-color: #fff3cd;
         }
 
         /* ========================================
@@ -488,226 +394,289 @@
                 padding: 1rem 1.5rem;
             }
         }
-
-        .demo-data-notice {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border: 2px solid #64748b;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
     </style>
 </head>
 <body>
     <!-- ========================================
-         📦 MODULE: 페이지 컨테이너
+         📦 MODULE: 페이지 헤더
          ======================================== -->
-    <div class="container py-4">
-        <!-- ========================================
-             📦 MODULE: 헤더 섹션
-             ======================================== -->
-        <div class="header-section">
-            <div class="container">
-                <h1><i class="fas fa-hospital-alt"></i> 응급실 운영 모니터링 시스템</h1>
-                <p class="lead">Emergency Department Operation Monitoring & Statistical Analysis</p>
-            </div>
+    <div class="header-section">
+        <div class="container">
+            <h1><i class="fas fa-hospital-alt"></i> 응급실 통합 모니터링 시스템</h1>
+            <p class="lead">Emergency Department Integrated Analysis System for Research</p>
         </div>
+    </div>
+
+    <div class="container">
+        <!-- ========================================
+             📦 MODULE: 탭 네비게이션
+             ======================================== -->
+        <ul class="nav nav-tabs nav-tabs-custom" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="patient-tab" data-bs-toggle="tab" data-bs-target="#patient-analysis" type="button" role="tab">
+                    <i class="fas fa-users"></i> 환자 데이터 분석
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule-management" type="button" role="tab">
+                    <i class="fas fa-calendar-alt"></i> 근무 스케줄 관리
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data-management" type="button" role="tab">
+                    <i class="fas fa-database"></i> 데이터 관리
+                </button>
+            </li>
+        </ul>
 
         <!-- ========================================
-             📦 MODULE: 공유 상태 알림
+             📦 MODULE: 탭 콘텐츠
              ======================================== -->
-        <div id="sharingStatusAlert" class="sharing-status no-data">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h5 class="mb-2">
-                        <i id="statusIcon" class="fas fa-exclamation-circle"></i> 
-                        <span id="statusTitle">데이터 대기 중</span>
-                    </h5>
-                    <p class="mb-0" id="statusMessage">
-                        아직 분석할 데이터가 없습니다. 엑셀 파일을 업로드하거나 데모 데이터를 불러와 시작하세요.
-                    </p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button class="btn btn-primary-academic" onclick="loadDemoData()">
-                        <i class="fas fa-play"></i> 데모 데이터 불러오기
-                    </button>
-                </div>
-            </div>
-        </div>
-
-
-
-        <!-- ========================================
-             📦 MODULE: 환자 데이터 분석
-             ======================================== -->
-        <div class="module-card">
-            <div class="module-header">
-                <i class="fas fa-upload"></i> 환자 데이터 분석
-            </div>
-            <div class="card-body">
-                <!-- 관리자/업로드자 모드 -->
-                <div id="uploaderMode">
-                    <!-- 파일 업로드 섹션 -->
-                    <div class="file-drop-area" id="fileDropArea">
-                        <i class="fas fa-cloud-upload-alt fa-4x mb-3" style="color: var(--primary-color);"></i>
-                        <h5>환자 데이터 엑셀 파일 업로드</h5>
-                        <p class="text-muted mb-3">파일을 여기에 드래그하거나 클릭하여 선택하세요</p>
-                        <input type="file" id="patientFileInput" accept=".xlsx,.xls" style="display: none;">
-                        <button class="btn btn-primary-academic" onclick="document.getElementById('patientFileInput').click()">
-                            <i class="fas fa-folder-open"></i> 파일 선택
-                        </button>
-                        <button class="btn btn-outline-primary ms-2" onclick="clearStoredData()">
-                            <i class="fas fa-trash"></i> 저장된 데이터 삭제
-                        </button>
+        <div class="tab-content" id="mainTabContent">
+            
+            <!-- ========================================
+                 📦 MODULE: 환자 데이터 분석 탭
+                 ======================================== -->
+            <div class="tab-pane fade show active" id="patient-analysis" role="tabpanel">
+                
+                <!-- 환자 데이터 업로드 -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <i class="fas fa-upload"></i> 환자 데이터 업로드
+                    </div>
+                    <div class="card-body">
+                        <div class="file-drop-area" id="patientFileDropArea">
+                            <i class="fas fa-cloud-upload-alt fa-4x mb-3" style="color: var(--primary-color);"></i>
+                            <h5>환자 데이터 엑셀 파일 업로드</h5>
+                            <p class="text-muted mb-3">파일을 여기에 드래그하거나 클릭하여 선택하세요</p>
+                            <input type="file" id="patientFileInput" accept=".xlsx,.xls" style="display: none;">
+                            <button class="btn btn-primary-academic" onclick="document.getElementById('patientFileInput').click()">
+                                <i class="fas fa-folder-open"></i> 파일 선택
+                            </button>
+                            <button class="btn btn-outline-primary ms-2" onclick="loadDemoPatientData()">
+                                <i class="fas fa-flask"></i> 데모 데이터
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 사용자/분석자 모드 -->
-                <div id="userMode" style="display: none;">
-                    <div class="demo-data-notice">
-                        <h6><i class="fas fa-info-circle"></i> 저장된 데이터 사용 중</h6>
-                        <p class="mb-2">기존에 업로드된 데이터를 사용하고 있습니다.</p>
-                        <button class="btn btn-sm btn-outline-primary" onclick="switchToUploaderMode()">
-                            <i class="fas fa-upload"></i> 새 데이터 업로드
-                        </button>
+                <!-- 분석 결과 -->
+                <div class="module-card" id="patientAnalysisResults" style="display: none;">
+                    <div class="module-header">
+                        <i class="fas fa-chart-bar"></i> 환자 데이터 분석 결과
                     </div>
-                </div>
-
-                <!-- 로딩 섹션 -->
-                <div class="loading-spinner" id="loadingSpinner">
-                    <div class="spinner-academic"></div>
-                    <h6 class="mb-3">데이터 분석 중입니다...</h6>
-                    <div id="loadingProgress"></div>
-                </div>
-
-                <!-- 분석 결과 섹션 -->
-                <div id="analysisResults" style="display: none;">
-                    <hr class="my-4">
-                    <h6 class="mb-4"><i class="fas fa-chart-bar"></i> 데이터 분석 결과</h6>
-                    
-                    <!-- 데이터 품질 정보 -->
-                    <div class="data-quality mb-4" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; font-size: 0.9rem;">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <h6><i class="fas fa-database"></i> 현재 데이터</h6>
-                                <span id="currentDatasetName" class="badge bg-primary">로드된 데이터</span>
+                    <div class="card-body">
+                        <!-- 통계 카드들 -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h3 id="totalPatients">0</h3>
+                                        <small>총 환자수</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6 text-end">
-                                <button class="btn btn-sm btn-outline-primary" onclick="exportPatientData()">
-                                    <i class="fas fa-download"></i> 데이터 내보내기
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h3 id="totalDoctors">0</h3>
+                                        <small>응급실 의사수</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h3 id="dateRange">-</h3>
+                                        <small>데이터 기간</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h3 id="avgPatientsPerDay">0</h3>
+                                        <small>일평균 환자수</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 차트 생성 버튼들 (8개) -->
+                        <div class="analysis-grid">
+                            <button class="analysis-btn" onclick="safeGenerateChart(generateDailyPatientChart, '일별 환자수')">
+                                <i class="fas fa-calendar-day"></i>
+                                일별 환자수 분석
+                                <small class="d-block mt-2">Daily Patient Volume</small>
+                            </button>
+                            
+                            <button class="analysis-btn" onclick="safeGenerateChart(generateWeeklyAverageChart, '요일별 평균환자수')">
+                                <i class="fas fa-calendar-week"></i>
+                                요일별 평균환자수
+                                <small class="d-block mt-2">Weekly Average</small>
+                            </button>
+                            
+                            <button class="analysis-btn" onclick="safeGenerateChart(generateHourlyAverageChart, '시간대별 내원환자수')">
+                                <i class="fas fa-clock"></i>
+                                시간대별 내원환자수
+                                <small class="d-block mt-2">Hourly Admission</small>
+                            </button>
+                            
+                            <button class="analysis-btn" onclick="safeGenerateChart(generateRealtimeOccupancyChart, '실시간 분당 재실환자수')">
+                                <i class="fas fa-bed"></i>
+                                실시간 분당 재실환자수
+                                <small class="d-block mt-2">Real-time Occupancy</small>
+                            </button>
+                            
+                            <button class="analysis-btn" onclick="safeGenerateChart(generateKTASDistributionChart, 'KTAS별 환자 분포')">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                KTAS별 환자 분포
+                                <small class="d-block mt-2">Acuity Distribution</small>
+                            </button>
+                            
+                            <button class="analysis-btn" onclick="safeGenerateChart(generateAdmissionVsDischargeChart, '입원 VS 귀가 분석')">
+                                <i class="fas fa-procedures"></i>
+                                입원 VS 귀가 분석
+                                <small class="d-block mt-2">Disposition Analysis</small>
+                            </button>
+                            
+                            <button class="analysis-btn" onclick="safeGenerateChart(generateAdmissionDepartmentChart, '입원과별 환자수')">
+                                <i class="fas fa-hospital"></i>
+                                입원과별 환자수
+                                <small class="d-block mt-2">Department Distribution</small>
+                            </button>
+                            
+                            <button class="analysis-btn" onclick="safeGenerateChart(generateDoctorPatientChart, '의사별 환자수')">
+                                <i class="fas fa-user-md"></i>
+                                응급실 의사별 환자수
+                                <small class="d-block mt-2">Physician Workload</small>
+                            </button>
+                        </div>
+
+                        <!-- 전체 분석 실행 버튼 -->
+                        <div class="text-center mb-4">
+                            <button class="btn btn-success btn-lg" onclick="generateAllPatientCharts()">
+                                <i class="fas fa-chart-pie"></i> 전체 환자 분석 차트 생성
+                            </button>
+                        </div>
+
+                        <!-- 차트 표시 영역 -->
+                        <div id="patientChartsContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+                 📦 MODULE: 근무 스케줄 관리 탭
+                 ======================================== -->
+            <div class="tab-pane fade" id="schedule-management" role="tabpanel">
+                
+                <!-- 스케줄 데이터 입력 -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <i class="fas fa-paste"></i> 근무 스케줄 데이터 입력
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info" role="alert">
+                            <h6><i class="fas fa-info-circle"></i> 근무시간 기준</h6>
+                            <ul class="mb-0">
+                                <li><strong>D (Day):</strong> 8:00~18:00 (10시간)</li>
+                                <li><strong>MDH (Mid-Day Holiday):</strong> 10:00~14:00 (4시간)</li>
+                                <li><strong>MD (Mid-Day):</strong> 16:00~익일 01:00 (9시간)</li>
+                                <li><strong>N (Night):</strong> 18:00~익일 08:00 또는 23:00~08:00 (14시간 또는 9시간)</li>
+                            </ul>
+                        </div>
+                        
+                        <textarea class="schedule-input-area w-100" id="scheduleData" 
+                                  placeholder="근무 스케줄 데이터를 입력하세요...
+
+형식: 날짜|요일|D1|D2|MDH|MD|N1|N2
+
+예시:
+1|화|이||강|강|정|
+2|수|허||박|박|강|
+3|목|권||강|오|선|"></textarea>
+                        
+                        <div class="text-center mt-3">
+                            <button class="btn btn-medical btn-lg" onclick="processScheduleData()">
+                                <i class="fas fa-cogs"></i> 스케줄 변환
+                            </button>
+                            <button class="btn btn-outline-secondary btn-lg ms-2" onclick="loadSampleSchedule()">
+                                <i class="fas fa-flask"></i> 샘플 로드
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 스케줄 변환 결과 -->
+                <div class="module-card" id="scheduleResults" style="display: none;">
+                    <div class="module-header">
+                        <i class="fas fa-table"></i> 스케줄 변환 결과
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered result-table" id="scheduleTable">
+                                <!-- 스케줄 테이블이 여기에 생성됩니다 -->
+                            </table>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button class="btn btn-success btn-lg" onclick="generateDoctorWorkHoursChart()">
+                                <i class="fas fa-chart-pie"></i> 의사별 총 근무시간 차트
+                            </button>
+                            <button class="btn btn-info btn-lg ms-2" onclick="generateWorkloadAnalysis()">
+                                <i class="fas fa-chart-bar"></i> 근무량 분석
+                            </button>
+                        </div>
+
+                        <!-- 스케줄 차트 표시 영역 -->
+                        <div id="scheduleChartsContainer" class="mt-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+                 📦 MODULE: 데이터 관리 탭
+                 ======================================== -->
+            <div class="tab-pane fade" id="data-management" role="tabpanel">
+                
+                <!-- 저장된 데이터 목록 -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <i class="fas fa-database"></i> 저장된 데이터 관리
+                    </div>
+                    <div class="card-body">
+                        <div class="data-manager">
+                            <h6><i class="fas fa-list"></i> 업로드된 데이터 목록</h6>
+                            <div class="data-list" id="dataList">
+                                <div class="text-center text-muted py-4">
+                                    아직 업로드된 데이터가 없습니다.
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="btn btn-primary-academic" onclick="refreshDataList()">
+                                    <i class="fas fa-sync"></i> 목록 새로고침
+                                </button>
+                                <button class="btn btn-danger ms-2" onclick="clearAllData()">
+                                    <i class="fas fa-trash"></i> 모든 데이터 삭제
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 통계 카드들 -->
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value" id="totalPatients">0</div>
-                                <div class="stat-label"><i class="fas fa-users"></i> 총 환자수</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value" id="totalDoctors">0</div>
-                                <div class="stat-label"><i class="fas fa-user-md"></i> 응급실 의사수</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value" id="dateRange">-</div>
-                                <div class="stat-label"><i class="fas fa-calendar-alt"></i> 데이터 기간</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value" id="avgPatientsPerDay">0</div>
-                                <div class="stat-label"><i class="fas fa-clock"></i> 일평균 환자수</div>
+                        <!-- 선택된 데이터 정보 -->
+                        <div id="selectedDataInfo" style="display: none;">
+                            <h6><i class="fas fa-info-circle"></i> 선택된 데이터 정보</h6>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div id="dataInfoContent"></div>
+                                    <button class="btn btn-success mt-3" onclick="analyzeSelectedData()">
+                                        <i class="fas fa-play"></i> 이 데이터로 분석 시작
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- 다음 단계 버튼 -->
-                    <div class="text-center mt-4">
-                        <button class="btn btn-success-academic btn-lg" onclick="goToStep2()">
-                            <i class="fas fa-arrow-right"></i> 통계 분석 시작
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================
-             📦 MODULE: 통계 분석 및 차트 생성
-             ======================================== -->
-        <div class="module-card" id="step2Module" style="display: none;">
-            <div class="module-header">
-                <i class="fas fa-chart-bar"></i> 통계 분석 및 차트 생성
-            </div>
-            <div class="card-body">
-                <!-- 분석 버튼 그리드 -->
-                <div class="analysis-grid">
-                    <button class="analysis-btn" onclick="safeGenerateChart(generateDailyPatientChart, '일별 환자수')">
-                        <i class="fas fa-calendar-day"></i>
-                        일별 환자수 분석
-                        <small class="d-block mt-2">Daily Patient Volume</small>
-                    </button>
-                    
-                    <button class="analysis-btn" onclick="safeGenerateChart(generateWeeklyAverageChart, '요일별 평균환자수')">
-                        <i class="fas fa-calendar-week"></i>
-                        요일별 평균환자수
-                        <small class="d-block mt-2">Weekly Average</small>
-                    </button>
-                    
-                    <button class="analysis-btn" onclick="safeGenerateChart(generateHourlyAverageChart, '시간대별 내원환자수')">
-                        <i class="fas fa-clock"></i>
-                        시간대별 내원환자수
-                        <small class="d-block mt-2">Hourly Admission</small>
-                    </button>
-                    
-                    <button class="analysis-btn" onclick="safeGenerateChart(generateRealtimeOccupancyChart, '실시간 분당 재실환자수')">
-                        <i class="fas fa-bed"></i>
-                        실시간 분당 재실환자수
-                        <small class="d-block mt-2">Real-time Occupancy</small>
-                    </button>
-                    
-                    <button class="analysis-btn" onclick="safeGenerateChart(generateKTASDistributionChart, 'KTAS별 환자 분포')">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        KTAS별 환자 분포
-                        <small class="d-block mt-2">Acuity Distribution</small>
-                    </button>
-                    
-                    <button class="analysis-btn" onclick="safeGenerateChart(generateAdmissionVsDischargeChart, '입원 VS 귀가 분석')">
-                        <i class="fas fa-procedures"></i>
-                        입원 VS 귀가 분석
-                        <small class="d-block mt-2">Disposition Analysis</small>
-                    </button>
-                    
-                    <button class="analysis-btn" onclick="safeGenerateChart(generateAdmissionDepartmentChart, '입원과별 환자수')">
-                        <i class="fas fa-hospital"></i>
-                        입원과별 환자수
-                        <small class="d-block mt-2">Department Distribution</small>
-                    </button>
-                    
-                    <button class="analysis-btn" onclick="safeGenerateChart(generateDoctorPatientChart, '의사별 환자수')">
-                        <i class="fas fa-user-md"></i>
-                        응급실 의사별 환자수
-                        <small class="d-block mt-2">Physician Workload</small>
-                    </button>
-                </div>
-
-                <!-- 전체 분석 실행 버튼 -->
-                <div class="text-center mb-4">
-                    <button class="btn btn-success-academic btn-lg" onclick="generateAllCharts()">
-                        <i class="fas fa-chart-pie"></i> 전체 분석 차트 생성
-                    </button>
-                </div>
-
-                <!-- 차트 표시 영역 -->
-                <div id="chartsContainer" class="charts-container">
-                    <!-- 차트들이 여기에 동적으로 생성됩니다 -->
                 </div>
             </div>
         </div>
@@ -724,93 +693,290 @@
            📦 MODULE: 전역 변수 및 상태 관리
            ======================================== */
         let patientData = null;
-        let analysisResults = null;
+        let scheduleData = {};
+        let selectedDataKey = null;
         let generatedCharts = {};
+        let analysisResults = null;
         let realtimeOccupancyData = null;
-        let isDataShared = false; // 데이터가 공유 상태인지 확인
 
-        /* Chart.js 데이터레이블 플러그인 등록 */
+        // Chart.js 데이터레이블 플러그인 등록
         Chart.register(ChartDataLabels);
 
         /* ========================================
-           📦 MODULE: 로컬 스토리지 관리
+           📦 MODULE: 데이터 저장 관리자 (개선된 버전)
            ======================================== */
-        const StorageManager = {
-            // 데이터 저장 키
-            STORAGE_KEYS: {
-                PATIENT_DATA: 'er_patient_data',
-                ANALYSIS_RESULTS: 'er_analysis_results',
-                REALTIME_DATA: 'er_realtime_data',
-                LAST_UPLOAD: 'er_last_upload_time',
-                DATA_SOURCE: 'er_data_source'
+        const DataManager = {
+            // 저장된 데이터 키 목록 가져오기
+            getStoredDataKeys: function() {
+                const keys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('er_data_')) {
+                        keys.push(key);
+                    }
+                }
+                return keys.sort();
             },
 
-            // 데이터 저장
-            saveData: function(patientData, analysisResults, realtimeData = null, dataSource = 'upload') {
+            // 로컬스토리지 용량 확인
+            checkStorageQuota: function() {
                 try {
-                    const saveTime = new Date().toISOString();
-                    
-                    // 메인 데이터 저장
-                    localStorage.setItem(this.STORAGE_KEYS.PATIENT_DATA, JSON.stringify(patientData));
-                    localStorage.setItem(this.STORAGE_KEYS.ANALYSIS_RESULTS, JSON.stringify(analysisResults));
-                    localStorage.setItem(this.STORAGE_KEYS.LAST_UPLOAD, saveTime);
-                    localStorage.setItem(this.STORAGE_KEYS.DATA_SOURCE, dataSource);
-                    
-                    // 실시간 데이터가 있으면 저장
-                    if (realtimeData) {
-                        localStorage.setItem(this.STORAGE_KEYS.REALTIME_DATA, JSON.stringify(realtimeData));
+                    if (navigator.storage && navigator.storage.estimate) {
+                        navigator.storage.estimate().then(estimate => {
+                            const usedMB = Math.round(estimate.usage / 1024 / 1024 * 100) / 100;
+                            const quotaMB = Math.round(estimate.quota / 1024 / 1024 * 100) / 100;
+                            console.log(`💾 스토리지 사용량: ${usedMB}MB / ${quotaMB}MB`);
+                        });
                     }
-
-                    console.log('✅ 데이터 저장 완료:', saveTime);
-                    return true;
+                    
+                    // 로컬스토리지 크기 추정
+                    let localStorageSize = 0;
+                    for (let key in localStorage) {
+                        if (localStorage.hasOwnProperty(key)) {
+                            localStorageSize += localStorage[key].length + key.length;
+                        }
+                    }
+                    const localStorageMB = Math.round(localStorageSize / 1024 / 1024 * 100) / 100;
+                    console.log(`💾 로컬스토리지 사용량: ${localStorageMB}MB`);
+                    
+                    return localStorageMB;
                 } catch (error) {
-                    console.error('❌ 데이터 저장 오류:', error);
-                    return false;
+                    console.error('스토리지 용량 확인 오류:', error);
+                    return 0;
                 }
             },
 
-            // 데이터 불러오기
-            loadData: function() {
+            // 데이터 압축 (큰 데이터를 위한)
+            compressData: function(data) {
                 try {
-                    const patientDataStr = localStorage.getItem(this.STORAGE_KEYS.PATIENT_DATA);
-                    const analysisResultsStr = localStorage.getItem(this.STORAGE_KEYS.ANALYSIS_RESULTS);
-                    const realtimeDataStr = localStorage.getItem(this.STORAGE_KEYS.REALTIME_DATA);
-                    const lastUpload = localStorage.getItem(this.STORAGE_KEYS.LAST_UPLOAD);
-                    const dataSource = localStorage.getItem(this.STORAGE_KEYS.DATA_SOURCE) || 'unknown';
-
-                    if (!patientDataStr || !analysisResultsStr) {
-                        console.log('📭 저장된 데이터가 없습니다.');
-                        return null;
+                    // 간단한 압축: 불필요한 필드 제거 및 데이터 최적화
+                    if (Array.isArray(data)) {
+                        return data.map(item => {
+                            // 환자 데이터 최적화
+                            if (item.visitDate && item.visitTime) {
+                                return {
+                                    vd: item.visitDate,
+                                    vt: item.visitTime,
+                                    doc: item.doctor,
+                                    age: item.age,
+                                    ktas: item.ktas,
+                                    result: item.result,
+                                    hour: item.hour,
+                                    dayOfWeek: item.dayOfWeek,
+                                    stayMinutes: item.stayMinutes
+                                };
+                            }
+                            return item;
+                        });
                     }
-
-                    const data = {
-                        patientData: JSON.parse(patientDataStr),
-                        analysisResults: JSON.parse(analysisResultsStr),
-                        realtimeData: realtimeDataStr ? JSON.parse(realtimeDataStr) : null,
-                        lastUpload: lastUpload,
-                        dataSource: dataSource
-                    };
-
-                    console.log('✅ 저장된 데이터 불러오기 완료:', {
-                        patients: data.patientData.length,
-                        lastUpload: data.lastUpload,
-                        source: data.dataSource
-                    });
-
                     return data;
+                } catch (error) {
+                    console.warn('데이터 압축 실패, 원본 데이터 사용:', error);
+                    return data;
+                }
+            },
+
+            // 데이터 압축 해제
+            decompressData: function(compressedData) {
+                try {
+                    if (Array.isArray(compressedData)) {
+                        return compressedData.map(item => {
+                            // 압축된 환자 데이터 복원
+                            if (item.vd && item.vt) {
+                                return {
+                                    visitDate: item.vd,
+                                    visitTime: item.vt,
+                                    doctor: item.doc,
+                                    age: item.age,
+                                    ktas: item.ktas,
+                                    result: item.result,
+                                    hour: item.hour,
+                                    dayOfWeek: item.dayOfWeek,
+                                    stayMinutes: item.stayMinutes,
+                                    // 복원된 필드들
+                                    visitDateTime: new Date(`${item.vd} ${item.vt}:00`),
+                                    timeCategory: item.hour >= 8 && item.hour < 18 ? 'D' : 'N',
+                                    isValid: true
+                                };
+                            }
+                            return item;
+                        });
+                    }
+                    return compressedData;
+                } catch (error) {
+                    console.warn('데이터 압축 해제 실패, 원본 데이터 사용:', error);
+                    return compressedData;
+                }
+            },
+
+            // 기존 데이터 정리 (용량 확보)
+            cleanupOldData: function() {
+                try {
+                    const keys = this.getStoredDataKeys();
+                    if (keys.length > 10) { // 10개 이상이면 오래된 것 삭제
+                        const sortedKeys = keys.sort((a, b) => {
+                            const timeA = parseInt(a.split('_')[2]);
+                            const timeB = parseInt(b.split('_')[2]);
+                            return timeA - timeB;
+                        });
+                        
+                        // 가장 오래된 5개 삭제
+                        const keysToDelete = sortedKeys.slice(0, 5);
+                        keysToDelete.forEach(key => {
+                            localStorage.removeItem(key);
+                            console.log(`🗑️ 오래된 데이터 삭제: ${key}`);
+                        });
+                        
+                        return keysToDelete.length;
+                    }
+                    return 0;
+                } catch (error) {
+                    console.error('데이터 정리 오류:', error);
+                    return 0;
+                }
+            },
+
+            // 개선된 데이터 저장
+            saveData: function(data, name, type = 'patient') {
+                const timestamp = new Date().toISOString();
+                const key = `er_data_${type}_${Date.now()}`;
+                
+                try {
+                    // 1단계: 스토리지 용량 확인
+                    const currentUsage = this.checkStorageQuota();
+                    
+                    // 2단계: 데이터 크기 추정
+                    let dataToSave = data;
+                    if (type === 'patient' && Array.isArray(data) && data.length > 100) {
+                        // 큰 환자 데이터는 압축
+                        dataToSave = this.compressData(data);
+                        console.log(`📦 데이터 압축: ${data.length} → ${dataToSave.length} 레코드`);
+                    }
+                    
+                    const dataObject = {
+                        name: name,
+                        type: type,
+                        timestamp: timestamp,
+                        data: dataToSave,
+                        compressed: dataToSave !== data,
+                        version: '2.0'
+                    };
+                    
+                    const jsonString = JSON.stringify(dataObject);
+                    const dataSizeMB = Math.round(jsonString.length / 1024 / 1024 * 100) / 100;
+                    
+                    console.log(`💾 저장할 데이터 크기: ${dataSizeMB}MB`);
+                    
+                    // 3단계: 용량 초과 시 정리
+                    if (dataSizeMB > 2) { // 2MB 이상이면 정리
+                        const cleaned = this.cleanupOldData();
+                        if (cleaned > 0) {
+                            console.log(`🧹 ${cleaned}개 오래된 데이터 정리 완료`);
+                        }
+                    }
+                    
+                    // 4단계: 실제 저장 시도
+                    localStorage.setItem(key, jsonString);
+                    console.log('✅ 데이터 저장 완료:', key, `(${dataSizeMB}MB)`);
+                    return key;
+                    
+                } catch (error) {
+                    console.error('❌ 데이터 저장 오류:', error);
+                    
+                    // 5단계: 저장 실패 시 복구 시도
+                    if (error.name === 'QuotaExceededError' || error.message.includes('quota')) {
+                        console.log('🚨 스토리지 용량 초과, 정리 후 재시도...');
+                        
+                        try {
+                            // 강제 정리
+                            const cleaned = this.cleanupOldData();
+                            console.log(`🧹 강제 정리: ${cleaned}개 데이터 삭제`);
+                            
+                            // 더 압축된 데이터로 재시도
+                            if (type === 'patient' && Array.isArray(data)) {
+                                const minimalData = data.map(item => ({
+                                    vd: item.visitDate,
+                                    vt: item.visitTime,
+                                    doc: item.doctor,
+                                    h: item.hour
+                                }));
+                                
+                                const minimalObject = {
+                                    name: name + ' (압축됨)',
+                                    type: type,
+                                    timestamp: timestamp,
+                                    data: minimalData,
+                                    compressed: true,
+                                    minimal: true,
+                                    version: '2.0'
+                                };
+                                
+                                localStorage.setItem(key, JSON.stringify(minimalObject));
+                                console.log('✅ 압축된 데이터 저장 완료:', key);
+                                return key;
+                            }
+                        } catch (retryError) {
+                            console.error('❌ 재시도도 실패:', retryError);
+                            // 메모리에만 저장
+                            window.tempDataStorage = window.tempDataStorage || {};
+                            window.tempDataStorage[key] = {
+                                name: name + ' (임시)',
+                                type: type,
+                                timestamp: timestamp,
+                                data: data,
+                                temporary: true
+                            };
+                            console.log('📝 임시 메모리 저장:', key);
+                            return key;
+                        }
+                    }
+                    
+                    return null;
+                }
+            },
+
+            // 개선된 데이터 불러오기
+            loadData: function(key) {
+                try {
+                    // 로컬스토리지에서 먼저 시도
+                    let dataStr = localStorage.getItem(key);
+                    
+                    // 임시 메모리 스토리지에서 확인
+                    if (!dataStr && window.tempDataStorage && window.tempDataStorage[key]) {
+                        console.log('📝 임시 메모리에서 데이터 불러오기:', key);
+                        return window.tempDataStorage[key];
+                    }
+                    
+                    if (dataStr) {
+                        const parsedData = JSON.parse(dataStr);
+                        
+                        // 압축된 데이터 복원
+                        if (parsedData.compressed && !parsedData.minimal) {
+                            console.log('📦 압축된 데이터 복원 중...');
+                            parsedData.data = this.decompressData(parsedData.data);
+                        }
+                        
+                        return parsedData;
+                    }
+                    return null;
                 } catch (error) {
                     console.error('❌ 데이터 불러오기 오류:', error);
                     return null;
                 }
             },
 
-            // 데이터 삭제
-            clearData: function() {
+            // 개선된 데이터 삭제
+            deleteData: function(key) {
                 try {
-                    Object.values(this.STORAGE_KEYS).forEach(key => {
-                        localStorage.removeItem(key);
-                    });
-                    console.log('✅ 저장된 데이터 모두 삭제');
+                    // 로컬스토리지에서 삭제
+                    localStorage.removeItem(key);
+                    
+                    // 임시 메모리에서도 삭제
+                    if (window.tempDataStorage && window.tempDataStorage[key]) {
+                        delete window.tempDataStorage[key];
+                    }
+                    
+                    console.log('✅ 데이터 삭제 완료:', key);
                     return true;
                 } catch (error) {
                     console.error('❌ 데이터 삭제 오류:', error);
@@ -818,74 +984,48 @@
                 }
             },
 
-            // 데이터 존재 여부 확인
-            hasData: function() {
-                return localStorage.getItem(this.STORAGE_KEYS.PATIENT_DATA) !== null;
-            }
-        };
-
-        /* ========================================
-           📦 MODULE: UI 상태 관리
-           ======================================== */
-        const UIStateManager = {
-            // 공유 상태 업데이트
-            updateSharingStatus: function(hasData, isDemo = false, dataSource = 'unknown') {
-                const statusAlert = document.getElementById('sharingStatusAlert');
-                const statusIcon = document.getElementById('statusIcon');
-                const statusTitle = document.getElementById('statusTitle');
-                const statusMessage = document.getElementById('statusMessage');
-
-                if (hasData) {
-                    if (isDemo) {
-                        // 데모 데이터 상태
-                        statusAlert.className = 'sharing-status demo-mode';
-                        statusIcon.className = 'fas fa-flask';
-                        statusTitle.textContent = '데모 데이터 사용 중';
-                        statusMessage.textContent = '샘플 데이터로 분석 기능을 체험해보세요. 실제 엑셀 파일을 업로드하여 본격적인 분석을 시작할 수 있습니다.';
-                    } else {
-                        // 실제 데이터 상태
-                        statusAlert.className = 'sharing-status';
-                        statusIcon.className = 'fas fa-check-circle';
-                        statusTitle.textContent = '데이터 준비 완료';
-                        statusMessage.textContent = '데이터가 성공적으로 로드되었습니다. 분석을 시작하세요.';
+            // 개선된 모든 데이터 삭제
+            clearAllData: function() {
+                try {
+                    const keys = this.getStoredDataKeys();
+                    keys.forEach(key => this.deleteData(key));
+                    
+                    // 임시 메모리도 정리
+                    if (window.tempDataStorage) {
+                        window.tempDataStorage = {};
                     }
                     
-                    isDataShared = true;
-                } else {
-                    // 데이터 없음
-                    statusAlert.className = 'sharing-status no-data';
-                    statusIcon.className = 'fas fa-exclamation-circle';
-                    statusTitle.textContent = '데이터 대기 중';
-                    statusMessage.textContent = '아직 분석할 데이터가 없습니다. 엑셀 파일을 업로드하거나 데모 데이터를 불러와 시작하세요.';
-                    isDataShared = false;
+                    console.log('✅ 모든 데이터 삭제 완료');
+                } catch (error) {
+                    console.error('❌ 데이터 삭제 오류:', error);
                 }
             },
 
-            // 업로드 모드 vs 사용자 모드 전환
-            switchMode: function(mode) {
-                const uploaderMode = document.getElementById('uploaderMode');
-                const userMode = document.getElementById('userMode');
-                
-                if (mode === 'uploader') {
-                    uploaderMode.style.display = 'block';
-                    userMode.style.display = 'none';
-                } else {
-                    uploaderMode.style.display = 'none';
-                    userMode.style.display = 'block';
+            // 저장소 상태 확인
+            getStorageStatus: function() {
+                try {
+                    const totalKeys = this.getStoredDataKeys().length;
+                    const memoryKeys = window.tempDataStorage ? Object.keys(window.tempDataStorage).length : 0;
+                    const storageUsage = this.checkStorageQuota();
+                    
+                    return {
+                        totalDatasets: totalKeys + memoryKeys,
+                        persistentDatasets: totalKeys,
+                        temporaryDatasets: memoryKeys,
+                        storageUsageMB: storageUsage
+                    };
+                } catch (error) {
+                    console.error('저장소 상태 확인 오류:', error);
+                    return { totalDatasets: 0, persistentDatasets: 0, temporaryDatasets: 0, storageUsageMB: 0 };
                 }
             }
         };
 
         /* ========================================
-           📦 MODULE: 환자 데이터 분석기 (기존 코드 유지)
+           📦 MODULE: 환자 데이터 분석기
            ======================================== */
         const PatientAnalyzer = {
-            config: {
-                requiredColumns: ['내원일자', '내원시간', '응급실의사'],
-                timeFormats: ['HHMM', 'HH:MM'],
-                dateFormats: ['YYYYMMDD', 'YYYY-MM-DD']
-            },
-
+            // 엑셀 파일 읽기
             readExcelFile: async function(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -898,10 +1038,8 @@
                                 header: 1,
                                 defval: null 
                             });
-                            console.log('✅ 엑셀 파일 읽기 완료:', jsonData.length, '행');
                             resolve(jsonData);
                         } catch (error) {
-                            console.error('❌ 엑셀 파일 읽기 오류:', error);
                             reject(error);
                         }
                     };
@@ -914,45 +1052,15 @@
                 });
             },
 
-            validateData: function(data) {
-                if (!data || data.length < 2) {
-                    throw new Error('데이터가 비어있거나 헤더만 있습니다.');
-                }
-
-                const headers = data[0];
-                const validation = {
-                    isValid: true,
-                    errors: [],
-                    warnings: [],
-                    summary: {
-                        totalRows: data.length - 1,
-                        totalColumns: headers.length,
-                        missingValues: 0
-                    }
-                };
-
-                this.config.requiredColumns.forEach(col => {
-                    if (!headers.includes(col)) {
-                        validation.errors.push(`필수 컬럼 '${col}' 누락`);
-                        validation.isValid = false;
-                    }
-                });
-
-                console.log('✅ 데이터 검증 완료:', validation.summary);
-                return validation;
-            },
-
+            // 환자 데이터 파싱
             parsePatientData: function(rawData) {
                 const headers = rawData[0];
                 const rows = rawData.slice(1);
                 
-                console.log('📊 === 환자 데이터 파싱 시작 ===');
-                
                 const getColumnIndex = (columnName) => {
-                    const index = headers.findIndex(header => 
+                    return headers.findIndex(header => 
                         header && header.toString().includes(columnName)
                     );
-                    return index;
                 };
 
                 const indices = {
@@ -970,13 +1078,6 @@
                     actualExitDate: getColumnIndex('실제퇴실일자'),
                     actualExitTime: getColumnIndex('실제퇴실시간')
                 };
-
-                const requiredFields = ['visitDate', 'visitTime', 'doctor'];
-                const missingFields = requiredFields.filter(field => indices[field] === -1);
-                
-                if (missingFields.length > 0) {
-                    throw new Error(`필수 컬럼이 없습니다: ${missingFields.join(', ')}`);
-                }
 
                 const processedData = rows.map((row, index) => {
                     try {
@@ -1057,32 +1158,7 @@
                     }
                 }
                 
-                // 2순위: 실제퇴실일자/시간 - 내원일자/시간
-                if (indices.actualExitDate !== -1 && indices.actualExitTime !== -1 && 
-                    row[indices.actualExitDate] && row[indices.actualExitTime]) {
-                    try {
-                        const visitDate = this.parseDate(row[indices.visitDate]);
-                        const visitTime = this.parseTime(row[indices.visitTime]);
-                        const exitDate = this.parseDate(row[indices.actualExitDate]);
-                        const exitTime = this.parseTime(row[indices.actualExitTime]);
-                        
-                        if (visitDate && visitTime && exitDate && exitTime) {
-                            const visitDateTime = new Date(`${visitDate} ${visitTime}:00`);
-                            const exitDateTime = new Date(`${exitDate} ${exitTime}:00`);
-                            
-                            const diffMs = exitDateTime.getTime() - visitDateTime.getTime();
-                            const diffMinutes = diffMs / (1000 * 60);
-                            
-                            if (diffMinutes > 0 && diffMinutes < 1440) {
-                                return diffMinutes;
-                            }
-                        }
-                    } catch (error) {
-                        console.warn('퇴실시간 계산 오류:', error);
-                    }
-                }
-                
-                // 3순위: 추정
+                // 2순위: 추정
                 return this.estimateStayTime();
             },
 
@@ -1092,32 +1168,6 @@
                 const randomFactor = 0.7 + (Math.random() * 0.6);
                 const estimatedHours = avgStayHours * randomFactor;
                 return Math.round(estimatedHours * 60);
-            },
-
-            // 날짜 파싱
-            parseDate: function(dateValue) {
-                if (!dateValue) return null;
-                
-                const dateStr = dateValue.toString();
-                if (dateStr.length === 8) {
-                    return `${dateStr.substr(0,4)}-${dateStr.substr(4,2)}-${dateStr.substr(6,2)}`;
-                } else if (dateStr.includes('-')) {
-                    return dateStr;
-                }
-                return null;
-            },
-
-            // 시간 파싱
-            parseTime: function(timeValue) {
-                if (!timeValue) return null;
-                
-                const timeStr = timeValue.toString().padStart(4, '0');
-                if (timeStr.length === 4) {
-                    return `${timeStr.substr(0,2)}:${timeStr.substr(2,2)}`;
-                } else if (timeStr.includes(':')) {
-                    return timeStr;
-                }
-                return null;
             },
 
             categorizeTime: function(timeString) {
@@ -1188,88 +1238,252 @@
         };
 
         /* ========================================
-           📦 MODULE: 데모 데이터 생성기
+           📦 MODULE: 스케줄 관리자
            ======================================== */
-        const DemoDataGenerator = {
-            generateDemoData: function() {
-                console.log('🎭 데모 데이터 생성 시작...');
-                
-                const doctors = ['김응급', '박외상', '이내과', '최소아', '정신경'];
-                const symptoms = ['복통', '흉통', '두통', '호흡곤란', '외상', '발열', '어지러움'];
-                const ktasLevels = [1, 2, 3, 4, 5];
-                const results = ['귀가', '입원', '전원', '사망', '자의퇴원'];
-                const departments = ['내과', '외과', '정형외과', '신경외과', '소아과', '산부인과'];
-                
-                const demoPatients = [];
-                const baseDate = new Date('2024-06-01');
-                
-                // 30일간 데이터 생성
-                for (let day = 0; day < 30; day++) {
-                    const currentDate = new Date(baseDate);
-                    currentDate.setDate(baseDate.getDate() + day);
-                    const dateStr = currentDate.toISOString().split('T')[0];
+        const ScheduleManager = {
+            // 의사명 매핑
+            doctorNameMapping: {
+                '강': '강희동',
+                '오': '오세현',
+                '정': '정상구',
+                '이': '이유진',
+                '박': '박인준',
+                '권': '권재화',
+                '선': '선경민',
+                '허': '허석진',
+                '이2': '이기헌'
+            },
+
+            // 근무시간 매핑 (시간 단위)
+            shiftHours: {
+                'D': 10,    // 8:00~18:00 (10시간)
+                'MDH': 4,   // 10:00~14:00 (4시간)
+                'MD': 9,    // 16:00~익일 01:00 (9시간)
+                'N': 14     // 18:00~익일 08:00 (14시간) 또는 23:00~08:00 (9시간) - 평균 14시간 사용
+            },
+
+            // 의사명 변환
+            convertDoctorName: function(shortName) {
+                const trimmed = shortName.trim();
+                return this.doctorNameMapping[trimmed] || trimmed;
+            },
+
+            // 스케줄 데이터 파싱
+            parseScheduleData: function(rawData) {
+                const lines = rawData.split('\n').filter(line => line.trim());
+                const parsedData = {};
+
+                lines.forEach((line, index) => {
+                    const parts = line.split('|');
                     
-                    // 하루에 30-80명의 환자 (요일별 변동)
-                    const dayOfWeek = currentDate.getDay();
-                    let basePatients = 50;
-                    if (dayOfWeek === 0 || dayOfWeek === 6) basePatients += 15; // 주말 증가
-                    
-                    const dailyPatients = basePatients + Math.floor(Math.random() * 30);
-                    
-                    for (let p = 0; p < dailyPatients; p++) {
-                        // 시간별 분포 (밤과 저녁에 더 많음)
-                        let hour;
-                        const timeRandom = Math.random();
-                        if (timeRandom < 0.3) hour = Math.floor(Math.random() * 8) + 18; // 18-01시 (30%)
-                        else if (timeRandom < 0.5) hour = Math.floor(Math.random() * 6) + 6; // 06-11시 (20%)
-                        else hour = Math.floor(Math.random() * 24); // 전체 시간 (50%)
+                    if (parts.length >= 8) {
+                        const day = parseInt(parts[0]);
                         
-                        if (hour >= 24) hour -= 24;
-                        
-                        const minute = Math.floor(Math.random() * 60);
-                        const visitTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                        
-                        // 체류시간 (1-12시간, 대부분 2-6시간)
-                        const stayHours = 2 + Math.random() * 4 + (Math.random() < 0.2 ? Math.random() * 6 : 0);
-                        const stayMinutes = Math.round(stayHours * 60);
-                        
-                        // 퇴실시간 계산
-                        const visitDateTime = new Date(`${dateStr} ${visitTime}:00`);
-                        const exitDateTime = new Date(visitDateTime.getTime() + stayMinutes * 60 * 1000);
-                        
-                        const patient = {
-                            rowIndex: p + 1,
-                            visitDate: dateStr,
-                            visitTime: visitTime,
-                            visitDateTime: visitDateTime,
-                            exitDateTime: exitDateTime,
-                            stayMinutes: stayMinutes,
-                            stayHours: stayHours,
-                            patientName: `환자${day * 100 + p + 1}`,
-                            gender: Math.random() > 0.5 ? '남' : '여',
-                            age: Math.floor(Math.random() * 80) + 10,
-                            doctor: doctors[Math.floor(Math.random() * doctors.length)],
-                            symptom: symptoms[Math.floor(Math.random() * symptoms.length)],
-                            ktas: ktasLevels[Math.floor(Math.random() * ktasLevels.length)],
-                            result: results[Math.floor(Math.random() * results.length)],
-                            admissionDept: Math.random() > 0.7 ? departments[Math.floor(Math.random() * departments.length)] : '',
-                            timeCategory: hour >= 8 && hour < 18 ? 'D' : 'N',
-                            dayOfWeek: ['일', '월', '화', '수', '목', '금', '토'][dayOfWeek],
-                            hour: hour,
-                            isValid: true
+                        parsedData[day] = {
+                            date: `2025-07-${day.toString().padStart(2, '0')}`,
+                            day: parts[1].trim(),
+                            d1: this.convertDoctorName(parts[2]),
+                            d2: this.convertDoctorName(parts[3]),
+                            mdh: this.convertDoctorName(parts[4]),
+                            md: this.convertDoctorName(parts[5]),
+                            n1: this.convertDoctorName(parts[6]),
+                            n2: this.convertDoctorName(parts[7])
                         };
-                        
-                        demoPatients.push(patient);
                     }
-                }
+                });
+
+                return parsedData;
+            },
+
+            // 의사별 총 근무시간 계산
+            calculateTotalWorkHours: function(scheduleData) {
+                const workHours = {};
+                const staffList = Object.values(this.doctorNameMapping);
                 
-                console.log(`✅ 데모 데이터 생성 완료: ${demoPatients.length}명 환자`);
-                return demoPatients;
+                // 초기화
+                staffList.forEach(staff => {
+                    workHours[staff] = 0;
+                });
+
+                // 근무시간 계산
+                Object.values(scheduleData).forEach(day => {
+                    // Day 1, Day 2
+                    if (day.d1 && workHours[day.d1] !== undefined) {
+                        workHours[day.d1] += this.shiftHours['D'];
+                    }
+                    if (day.d2 && workHours[day.d2] !== undefined) {
+                        workHours[day.d2] += this.shiftHours['D'];
+                    }
+                    
+                    // MDH
+                    if (day.mdh && workHours[day.mdh] !== undefined) {
+                        workHours[day.mdh] += this.shiftHours['MDH'];
+                    }
+                    
+                    // MD
+                    if (day.md && workHours[day.md] !== undefined) {
+                        workHours[day.md] += this.shiftHours['MD'];
+                    }
+                    
+                    // Night 1, Night 2
+                    if (day.n1 && workHours[day.n1] !== undefined) {
+                        workHours[day.n1] += this.shiftHours['N'];
+                    }
+                    if (day.n2 && workHours[day.n2] !== undefined) {
+                        workHours[day.n2] += this.shiftHours['N'];
+                    }
+                });
+
+                return workHours;
+            },
+
+            // 근무량 통계 계산 (기존 기능)
+            calculateWorkloadStats: function(scheduleData) {
+                const stats = {};
+                const staffList = Object.values(this.doctorNameMapping);
+                
+                // 통계 초기화
+                staffList.forEach(staff => {
+                    stats[staff] = { d: 0, mdh: 0, md: 0, n: 0, total: 0 };
+                });
+
+                // 통계 계산
+                Object.values(scheduleData).forEach(day => {
+                    if (day.d1 && stats[day.d1]) stats[day.d1].d++;
+                    if (day.d2 && stats[day.d2]) stats[day.d2].d++;
+                    if (day.mdh && stats[day.mdh]) stats[day.mdh].mdh++;
+                    if (day.md && stats[day.md]) stats[day.md].md++;
+                    if (day.n1 && stats[day.n1]) stats[day.n1].n++;
+                    if (day.n2 && stats[day.n2]) stats[day.n2].n++;
+                });
+
+                // 총합 계산
+                staffList.forEach(staff => {
+                    stats[staff].total = stats[staff].d + stats[staff].mdh + stats[staff].md + stats[staff].n;
+                });
+
+                return stats;
             }
         };
 
         /* ========================================
-           📦 MODULE: 실시간 재실환자수 계산기 (기존 코드 유지)
+           📦 MODULE: 차트 생성기
+           ======================================== */
+        const ChartGenerator = {
+            // 공통 차트 옵션
+            getCommonOptions: function(title, showDataLabels = false) {
+                const options = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title,
+                            font: { size: 18, weight: '600' },
+                            color: '#1e293b',
+                            padding: 20
+                        },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { size: 12, weight: '500' },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, font: { size: 11 } },
+                            grid: { color: '#e2e8f0' }
+                        },
+                        x: {
+                            ticks: { font: { size: 11 } },
+                            grid: { color: '#e2e8f0' }
+                        }
+                    }
+                };
+
+                if (showDataLabels) {
+                    options.plugins.datalabels = {
+                        anchor: 'end',
+                        align: 'top',
+                        font: { weight: '600', size: 11 },
+                        color: '#1e293b',
+                        formatter: function(value, context) {
+                            return value;
+                        }
+                    };
+                }
+
+                return options;
+            },
+
+            // 파이 차트 옵션
+            getPieChartOptions: function(title) {
+                return {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title,
+                            font: { size: 18, weight: '600' },
+                            color: '#1e293b',
+                            padding: 20
+                        },
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: { size: 12, weight: '500' },
+                                padding: 15,
+                                usePointStyle: true,
+                                boxWidth: 15
+                            }
+                        },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return percentage >= 5 ? `${value}` : '';
+                            },
+                            color: '#ffffff',
+                            font: { weight: 'bold', size: 12 },
+                            textStrokeColor: '#1e293b',
+                            textStrokeWidth: 1
+                        }
+                    }
+                };
+            },
+
+            // 차트 컨테이너 생성
+            createChartContainer: function(id, title) {
+                return `
+                    <div class="chart-container" id="${id}Container">
+                        <div class="chart-header">
+                            <h5><i class="fas fa-chart-bar"></i> ${title}</h5>
+                        </div>
+                        <div style="height: 400px;">
+                            <canvas id="${id}"></canvas>
+                        </div>
+                    </div>
+                `;
+            },
+
+            // 색상 팔레트
+            getAcademicColorPalette: function(count) {
+                const colors = [
+                    '#2563eb', '#dc2626', '#059669', '#d97706',
+                    '#7c3aed', '#0891b2', '#4f46e5', '#ea580c',
+                    '#65a30d', '#c2410c', '#7e22ce', '#0e7490'
+                ];
+                return colors.slice(0, count);
+            }
+        };
+
+        /* ========================================
+           📦 MODULE: 실시간 재실환자수 계산기
            ======================================== */
         const RealtimeOccupancyCalculator = {
             calculateRealtimeOccupancy: function(patients, config = {}) {
@@ -1390,154 +1604,83 @@
         };
 
         /* ========================================
-           📦 MODULE: 차트 생성기 (기존 코드 유지)
+           📦 MODULE: 데모 데이터 생성기
            ======================================== */
-        const ChartGenerator = {
-            getCommonOptions: function(title, showDataLabels = false) {
-                const options = {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: title,
-                            font: {
-                                size: 18,
-                                weight: '600'
-                            },
-                            color: '#1e293b',
-                            padding: 20
-                        },
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 12,
-                                    weight: '500'
-                                },
-                                padding: 15,
-                                usePointStyle: true
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0,
-                                font: {
-                                    size: 11
-                                }
-                            },
-                            grid: {
-                                color: '#e2e8f0'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                font: {
-                                    size: 11
-                                }
-                            },
-                            grid: {
-                                color: '#e2e8f0'
-                            }
-                        }
+        const DemoDataGenerator = {
+            generateDemoData: function() {
+                console.log('🎭 데모 데이터 생성 시작...');
+                
+                const doctors = ['김응급', '박외상', '이내과', '최소아', '정신경'];
+                const symptoms = ['복통', '흉통', '두통', '호흡곤란', '외상', '발열', '어지러움'];
+                const ktasLevels = [1, 2, 3, 4, 5];
+                const results = ['귀가', '입원', '전원', '사망', '자의퇴원'];
+                const departments = ['내과', '외과', '정형외과', '신경외과', '소아과', '산부인과'];
+                
+                const demoPatients = [];
+                const baseDate = new Date('2024-06-01');
+                
+                // 30일간 데이터 생성
+                for (let day = 0; day < 30; day++) {
+                    const currentDate = new Date(baseDate);
+                    currentDate.setDate(baseDate.getDate() + day);
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    
+                    // 하루에 30-80명의 환자 (요일별 변동)
+                    const dayOfWeek = currentDate.getDay();
+                    let basePatients = 50;
+                    if (dayOfWeek === 0 || dayOfWeek === 6) basePatients += 15; // 주말 증가
+                    
+                    const dailyPatients = basePatients + Math.floor(Math.random() * 30);
+                    
+                    for (let p = 0; p < dailyPatients; p++) {
+                        // 시간별 분포 (밤과 저녁에 더 많음)
+                        let hour;
+                        const timeRandom = Math.random();
+                        if (timeRandom < 0.3) hour = Math.floor(Math.random() * 8) + 18; // 18-01시 (30%)
+                        else if (timeRandom < 0.5) hour = Math.floor(Math.random() * 6) + 6; // 06-11시 (20%)
+                        else hour = Math.floor(Math.random() * 24); // 전체 시간 (50%)
+                        
+                        if (hour >= 24) hour -= 24;
+                        
+                        const minute = Math.floor(Math.random() * 60);
+                        const visitTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                        
+                        // 체류시간 (1-12시간, 대부분 2-6시간)
+                        const stayHours = 2 + Math.random() * 4 + (Math.random() < 0.2 ? Math.random() * 6 : 0);
+                        const stayMinutes = Math.round(stayHours * 60);
+                        
+                        // 퇴실시간 계산
+                        const visitDateTime = new Date(`${dateStr} ${visitTime}:00`);
+                        const exitDateTime = new Date(visitDateTime.getTime() + stayMinutes * 60 * 1000);
+                        
+                        const patient = {
+                            rowIndex: p + 1,
+                            visitDate: dateStr,
+                            visitTime: visitTime,
+                            visitDateTime: visitDateTime,
+                            exitDateTime: exitDateTime,
+                            stayMinutes: stayMinutes,
+                            stayHours: stayHours,
+                            patientName: `환자${day * 100 + p + 1}`,
+                            gender: Math.random() > 0.5 ? '남' : '여',
+                            age: Math.floor(Math.random() * 80) + 10,
+                            doctor: doctors[Math.floor(Math.random() * doctors.length)],
+                            symptom: symptoms[Math.floor(Math.random() * symptoms.length)],
+                            ktas: ktasLevels[Math.floor(Math.random() * ktasLevels.length)],
+                            result: results[Math.floor(Math.random() * results.length)],
+                            admissionDept: Math.random() > 0.7 ? departments[Math.floor(Math.random() * departments.length)] : '',
+                            timeCategory: hour >= 8 && hour < 18 ? 'D' : 'N',
+                            dayOfWeek: ['일', '월', '화', '수', '목', '금', '토'][dayOfWeek],
+                            hour: hour,
+                            isValid: true
+                        };
+                        
+                        demoPatients.push(patient);
                     }
-                };
-
-                if (showDataLabels) {
-                    options.plugins.datalabels = {
-                        anchor: 'end',
-                        align: 'top',
-                        font: {
-                            weight: '600',
-                            size: 11
-                        },
-                        color: '#1e293b',
-                        formatter: function(value, context) {
-                            return value;
-                        }
-                    };
                 }
-
-                return options;
-            },
-
-            getPieChartOptions: function(title) {
-                return {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: title,
-                            font: {
-                                size: 18,
-                                weight: '600'
-                            },
-                            color: '#1e293b',
-                            padding: 20
-                        },
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                font: {
-                                    size: 12,
-                                    weight: '500'
-                                },
-                                padding: 15,
-                                usePointStyle: true,
-                                boxWidth: 15
-                            }
-                        },
-                        datalabels: {
-                            formatter: (value, ctx) => {
-                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((value / total) * 100);
-                                return percentage >= 5 ? `${value}` : '';
-                            },
-                            color: '#ffffff',
-                            font: {
-                                weight: 'bold',
-                                size: 12
-                            },
-                            textStrokeColor: '#1e293b',
-                            textStrokeWidth: 1
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((context.parsed / total) * 100);
-                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                };
-            },
-
-            createChartContainer: function(id, title) {
-                return `
-                    <div class="chart-container" id="${id}Container">
-                        <div class="chart-header">
-                            <h5><i class="fas fa-chart-bar"></i> ${title}</h5>
-                        </div>
-                        <div style="height: 400px;">
-                            <canvas id="${id}"></canvas>
-                        </div>
-                    </div>
-                `;
-            },
-
-            getAcademicColorPalette: function(count) {
-                const colors = [
-                    '#2563eb', '#dc2626', '#059669', '#d97706',
-                    '#7c3aed', '#0891b2', '#4f46e5', '#ea580c',
-                    '#65a30d', '#c2410c', '#7e22ce', '#0e7490'
-                ];
-                return colors.slice(0, count);
+                
+                console.log(`✅ 데모 데이터 생성 완료: ${demoPatients.length}명 환자`);
+                return demoPatients;
             }
         };
 
@@ -1545,59 +1688,31 @@
            📦 MODULE: 초기화 및 이벤트 핸들러
            ======================================== */
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 통합된 응급실 모니터링 시스템 시작 (데이터 공유 버전)');
+            console.log('🚀 응급실 통합 모니터링 시스템 시작');
             initializeSystem();
         });
 
         function initializeSystem() {
-            // 저장된 데이터 확인 및 로드
-            const savedData = StorageManager.loadData();
-            
-            if (savedData) {
-                // 저장된 데이터가 있으면 바로 표시
-                console.log('💾 저장된 데이터 발견, 자동 로드 중...');
-                
-                patientData = savedData.patientData;
-                analysisResults = savedData.analysisResults;
-                realtimeOccupancyData = savedData.realtimeData;
-                
-                const isDemo = savedData.dataSource === 'demo';
-                
-                // UI 업데이트
-                UIStateManager.updateSharingStatus(true, isDemo, savedData.dataSource);
-                UIStateManager.switchMode('user');
-                displayAnalysisResults();
-                
-                // 데이터 소스 표시 (간소화)
-                document.getElementById('currentDatasetName').textContent = 
-                    isDemo ? '데모 데이터' : `업로드 데이터 (${new Date(savedData.lastUpload).toLocaleDateString()})`;
-                
-            } else {
-                // 저장된 데이터가 없으면 업로드 모드
-                console.log('📭 저장된 데이터 없음, 업로드 모드로 시작');
-                UIStateManager.updateSharingStatus(false);
-                UIStateManager.switchMode('uploader');
-            }
-            
-            // 파일 업로드 기능 초기화
+            // 파일 업로드 초기화
             initializeFileUpload();
+            
+            // 데이터 목록 새로고침
+            refreshDataList();
         }
 
         function initializeFileUpload() {
             const fileInput = document.getElementById('patientFileInput');
-            const dropArea = document.getElementById('fileDropArea');
+            const dropArea = document.getElementById('patientFileDropArea');
 
             fileInput.addEventListener('change', function(e) {
                 if (e.target.files.length > 0) {
-                    handleFileUpload(e.target.files[0]);
+                    handlePatientFileUpload(e.target.files[0]);
                 }
             });
 
             dropArea.addEventListener('dragover', function(e) {
                 e.preventDefault();
-                if (!dropArea.classList.contains('disabled')) {
-                    dropArea.classList.add('drag-over');
-                }
+                dropArea.classList.add('drag-over');
             });
 
             dropArea.addEventListener('dragleave', function(e) {
@@ -1609,196 +1724,153 @@
                 e.preventDefault();
                 dropArea.classList.remove('drag-over');
                 
-                if (!dropArea.classList.contains('disabled') && e.dataTransfer.files.length > 0) {
-                    handleFileUpload(e.dataTransfer.files[0]);
+                if (e.dataTransfer.files.length > 0) {
+                    handlePatientFileUpload(e.dataTransfer.files[0]);
                 }
             });
 
             dropArea.addEventListener('click', function() {
-                if (!dropArea.classList.contains('disabled')) {
-                    fileInput.click();
-                }
+                fileInput.click();
             });
         }
 
         /* ========================================
-           📦 MODULE: 파일 업로드 및 데이터 처리
+           📦 MODULE: 환자 데이터 처리 함수들 (개선된 버전)
            ======================================== */
-        async function handleFileUpload(file) {
-            console.log('📁 파일 업로드 시작:', file.name);
-            
+        async function handlePatientFileUpload(file) {
             if (!file.name.match(/\.(xlsx|xls)$/)) {
                 alert('엑셀 파일(.xlsx, .xls)만 업로드 가능합니다.');
                 return;
             }
 
-            showLoading(true);
-            updateLoadingProgress('파일 읽는 중...', 25);
-
             try {
+                console.log('📁 파일 업로드 시작:', file.name);
+                
+                // 진행 상황 표시
+                showUploadProgress('파일 읽는 중...', 25);
+                
                 const rawData = await PatientAnalyzer.readExcelFile(file);
-                updateLoadingProgress('데이터 검증 중...', 50);
-
-                const validation = PatientAnalyzer.validateData(rawData);
-                if (!validation.isValid) {
-                    throw new Error('데이터 검증 실패: ' + validation.errors.join(', '));
-                }
-
-                updateLoadingProgress('데이터 파싱 중...', 75);
-
+                showUploadProgress('데이터 파싱 중...', 50);
+                
                 patientData = PatientAnalyzer.parsePatientData(rawData);
-                updateLoadingProgress('통계 분석 중...', 90);
-
+                showUploadProgress('통계 분석 중...', 75);
+                
                 analysisResults = PatientAnalyzer.generateSummaryStats(patientData);
-                updateLoadingProgress('데이터 저장 중...', 95);
-
-                // 데이터 저장
-                const saveSuccess = StorageManager.saveData(patientData, analysisResults, null, 'upload');
-                if (!saveSuccess) {
-                    console.warn('⚠️ 데이터 저장에 실패했지만 분석은 계속 진행됩니다.');
-                }
-
-                updateLoadingProgress('완료!', 100);
-
+                showUploadProgress('데이터 저장 중...', 90);
+                
+                // 개선된 데이터 저장
+                const fileName = file.name.replace(/\.(xlsx|xls)$/i, '');
+                const savedKey = DataManager.saveData(patientData, fileName, 'patient');
+                
+                showUploadProgress('완료!', 100);
+                
+                // 결과 처리
                 setTimeout(() => {
-                    showLoading(false);
-                    displayAnalysisResults();
+                    hideUploadProgress();
                     
-                    // UI 상태 업데이트
-                    UIStateManager.updateSharingStatus(true, false, 'upload');
-                    UIStateManager.switchMode('user');
-                    
-                    // 데이터 소스 표시 (간소화)
-                    const fileName = file.name.replace(/\.(xlsx|xls)$/i, '');
-                    document.getElementById('currentDatasetName').textContent = fileName;
-                    
-                    // 성공 메시지
-                    alert('✅ 데이터 업로드 및 분석이 완료되었습니다!');
-                    
-                }, 1000);
+                    if (savedKey) {
+                        selectedDataKey = savedKey;
+                        displayPatientAnalysis();
+                        refreshDataList();
+                        
+                        // 저장 상태 확인
+                        const storageStatus = DataManager.getStorageStatus();
+                        let message = '✅ 데이터가 성공적으로 업로드되고 저장되었습니다!';
+                        
+                        if (storageStatus.temporaryDatasets > 0) {
+                            message += `\n\n📝 일부 데이터는 임시 메모리에 저장되었습니다.\n(영구 저장: ${storageStatus.persistentDatasets}개, 임시: ${storageStatus.temporaryDatasets}개)`;
+                        }
+                        
+                        alert(message);
+                        
+                    } else {
+                        // 저장에 완전히 실패한 경우에도 분석은 진행
+                        displayPatientAnalysis();
+                        alert('⚠️ 데이터 분석은 완료되었지만 저장에 실패했습니다.\n\n브라우저 저장 공간이 부족하거나 데이터가 너무 클 수 있습니다.\n분석 결과는 현재 세션에서만 사용 가능합니다.');
+                    }
+                }, 500);
 
             } catch (error) {
+                hideUploadProgress();
                 console.error('❌ 파일 처리 오류:', error);
-                showLoading(false);
-                alert('파일 처리 중 오류가 발생했습니다: ' + error.message);
+                alert('파일 처리 중 오류가 발생했습니다:\n\n' + error.message + '\n\n다른 파일을 시도해보시거나 데모 데이터를 사용해주세요.');
             }
         }
 
-        /* ========================================
-           📦 MODULE: 데모 데이터 로드
-           ======================================== */
-        function loadDemoData() {
-            console.log('🎭 데모 데이터 로드 시작...');
+        // 업로드 진행 상황 표시
+        function showUploadProgress(message, percentage) {
+            let progressContainer = document.getElementById('uploadProgressContainer');
             
-            showLoading(true);
-            updateLoadingProgress('데모 데이터 생성 중...', 25);
-            
-            setTimeout(() => {
-                try {
-                    updateLoadingProgress('환자 데이터 생성 중...', 50);
-                    
-                    // 데모 데이터 생성
-                    patientData = DemoDataGenerator.generateDemoData();
-                    
-                    updateLoadingProgress('통계 분석 중...', 75);
-                    
-                    // 분석 결과 생성
-                    analysisResults = PatientAnalyzer.generateSummaryStats(patientData);
-                    
-                    updateLoadingProgress('데모 데이터 저장 중...', 90);
-                    
-                    // 데모 데이터 저장
-                    StorageManager.saveData(patientData, analysisResults, null, 'demo');
-                    
-                    updateLoadingProgress('완료!', 100);
-                    
-                    setTimeout(() => {
-                        showLoading(false);
-                        displayAnalysisResults();
-                        
-                        // UI 상태 업데이트
-                        UIStateManager.updateSharingStatus(true, true, 'demo');
-                        UIStateManager.switchMode('user');
-                        
-                        // 데이터 소스 표시 (간소화)
-                        document.getElementById('currentDatasetName').textContent = '데모 데이터';
-                        
-                        console.log('✅ 데모 데이터 로드 완료');
-                        
-                    }, 1000);
-                    
-                } catch (error) {
-                    console.error('❌ 데모 데이터 생성 오류:', error);
-                    showLoading(false);
-                    alert('데모 데이터 생성 중 오류가 발생했습니다: ' + error.message);
-                }
-            }, 500);
-        }
-
-        /* ========================================
-           📦 MODULE: UI 컨트롤 함수들
-           ======================================== */
-        function switchToUploaderMode() {
-            UIStateManager.switchMode('uploader');
-        }
-
-        function clearStoredData() {
-            if (confirm('저장된 모든 데이터를 삭제하시겠습니까?\n\n삭제하면 다른 사용자들도 더 이상 이 데이터에 접근할 수 없습니다.')) {
-                const success = StorageManager.clearData();
-                if (success) {
-                    // 전역 변수 초기화
-                    patientData = null;
-                    analysisResults = null;
-                    realtimeOccupancyData = null;
-                    generatedCharts = {};
-                    
-                    // UI 초기화
-                    document.getElementById('analysisResults').style.display = 'none';
-                    document.getElementById('step2Module').style.display = 'none';
-                    document.getElementById('chartsContainer').innerHTML = '';
-                    
-                    // 상태 업데이트
-                    UIStateManager.updateSharingStatus(false);
-                    UIStateManager.switchMode('uploader');
-                    
-                    alert('✅ 저장된 데이터가 모두 삭제되었습니다.');
-                } else {
-                    alert('❌ 데이터 삭제 중 오류가 발생했습니다.');
-                }
+            if (!progressContainer) {
+                progressContainer = document.createElement('div');
+                progressContainer.id = 'uploadProgressContainer';
+                progressContainer.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    border: 2px solid var(--primary-color);
+                    border-radius: 12px;
+                    padding: 2rem;
+                    box-shadow: 0 20px 25px rgba(0,0,0,0.3);
+                    z-index: 9999;
+                    min-width: 300px;
+                    text-align: center;
+                `;
+                document.body.appendChild(progressContainer);
             }
-        }
-
-        function showLoading(show) {
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const analysisResults = document.getElementById('analysisResults');
             
-            if (show) {
-                loadingSpinner.style.display = 'block';
-                analysisResults.style.display = 'none';
-            } else {
-                loadingSpinner.style.display = 'none';
-            }
-        }
-
-        function updateLoadingProgress(message, percentage) {
-            const progressDiv = document.getElementById('loadingProgress');
-            progressDiv.innerHTML = `
-                <div class="progress progress-academic mb-3" style="height: 8px;">
-                    <div class="progress-bar progress-bar-academic" style="width: ${percentage}%"></div>
+            progressContainer.innerHTML = `
+                <div style="margin-bottom: 1rem;">
+                    <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
                 </div>
-                <p class="text-muted mb-0">${message} (${percentage}%)</p>
+                <h6 style="margin-bottom: 1rem; color: var(--dark-color);">${message}</h6>
+                <div style="background: #e2e8f0; border-radius: 10px; overflow: hidden; height: 8px;">
+                    <div style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); height: 100%; width: ${percentage}%; transition: width 0.3s ease;"></div>
+                </div>
+                <small style="color: var(--dark-color); margin-top: 0.5rem; display: block;">${percentage}%</small>
             `;
         }
 
-        function displayAnalysisResults() {
-            if (!analysisResults || !patientData) {
-                console.error('❌ 분석 결과 또는 환자 데이터가 없습니다.');
-                return;
+        // 업로드 진행 상황 숨기기
+        function hideUploadProgress() {
+            const progressContainer = document.getElementById('uploadProgressContainer');
+            if (progressContainer) {
+                document.body.removeChild(progressContainer);
             }
+        }
 
+        function loadDemoPatientData() {
+            console.log('🎭 환자 데모 데이터 로드 시작...');
+            
+            try {
+                patientData = DemoDataGenerator.generateDemoData();
+                analysisResults = PatientAnalyzer.generateSummaryStats(patientData);
+                
+                // 데모 데이터 저장
+                const savedKey = DataManager.saveData(patientData, '환자_데모데이터', 'patient');
+                
+                if (savedKey) {
+                    selectedDataKey = savedKey;
+                    refreshDataList();
+                }
+                
+                displayPatientAnalysis();
+                alert('✅ 환자 데모 데이터가 로드되었습니다!');
+                
+            } catch (error) {
+                console.error('❌ 데모 데이터 생성 오류:', error);
+                alert('데모 데이터 생성 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        function displayPatientAnalysis() {
+            if (!patientData || !analysisResults) return;
+            
+            // 통계 카드 업데이트
             document.getElementById('totalPatients').textContent = analysisResults.totalPatients.toLocaleString();
             document.getElementById('totalDoctors').textContent = Object.keys(analysisResults.doctorStats).length;
-            document.getElementById('avgPatientsPerDay').textContent = analysisResults.avgPatientsPerDay;
             
             if (analysisResults.dateRange.start && analysisResults.dateRange.end) {
                 const startDate = new Date(analysisResults.dateRange.start);
@@ -1806,25 +1878,18 @@
                 document.getElementById('dateRange').textContent = 
                     `${startDate.getMonth()+1}/${startDate.getDate()} - ${endDate.getMonth()+1}/${endDate.getDate()}`;
             }
+            
+            document.getElementById('avgPatientsPerDay').textContent = analysisResults.avgPatientsPerDay;
 
-            document.getElementById('analysisResults').style.display = 'block';
-        }
-
-        function goToStep2() {
-            if (!patientData || !analysisResults) {
-                alert('먼저 환자 데이터를 분석해주세요.');
-                return;
-            }
-
-            document.getElementById('step2Module').style.display = 'block';
-            document.getElementById('step2Module').scrollIntoView({ behavior: 'smooth' });
+            // 분석 결과 섹션 표시
+            document.getElementById('patientAnalysisResults').style.display = 'block';
         }
 
         /* ========================================
-           📦 MODULE: 차트 생성 함수들 (기존 코드 유지)
+           📦 MODULE: 환자 데이터 차트 생성 함수들 (8개)
            ======================================== */
 
-        // 1. 일별 환자수 그래프
+        // 1. 일별 환자수 차트
         function generateDailyPatientChart() {
             console.log('📊 일별 환자수 차트 생성 시작...');
             
@@ -1843,12 +1908,8 @@
             const sortedDates = Object.keys(dailyStats).sort();
             const patientCounts = sortedDates.map(date => dailyStats[date]);
 
-            if (sortedDates.length === 0) {
-                throw new Error('유효한 날짜 데이터가 없습니다.');
-            }
-
             const chartHtml = ChartGenerator.createChartContainer('dailyChart', '일별 환자수 분석');
-            const container = document.getElementById('chartsContainer');
+            const container = document.getElementById('patientChartsContainer');
             container.insertAdjacentHTML('afterbegin', chartHtml);
 
             const ctx = document.getElementById('dailyChart').getContext('2d');
@@ -1902,7 +1963,7 @@
             console.log('✅ 일별 환자수 차트 생성 완료');
         }
 
-        // 2. 요일별 평균환자수 그래프
+        // 2. 요일별 평균환자수 차트
         function generateWeeklyAverageChart() {
             console.log('📊 요일별 평균환자수 차트 생성 시작...');
             
@@ -1939,7 +2000,7 @@
             });
 
             const chartHtml = ChartGenerator.createChartContainer('weeklyChart', '요일별 평균환자수 분석');
-            const container = document.getElementById('chartsContainer');
+            const container = document.getElementById('patientChartsContainer');
             container.insertAdjacentHTML('afterbegin', chartHtml);
 
             const ctx = document.getElementById('weeklyChart').getContext('2d');
@@ -1986,7 +2047,7 @@
             console.log('✅ 요일별 평균환자수 차트 생성 완료');
         }
 
-        // 3. 시간대별 내원환자수 그래프
+        // 3. 시간대별 내원환자수 차트
         function generateHourlyAverageChart() {
             if (!patientData) {
                 alert('먼저 환자 데이터를 업로드해주세요.');
@@ -2014,7 +2075,7 @@
             }
 
             const chartHtml = ChartGenerator.createChartContainer('hourlyChart', '시간대별 내원환자수 분석');
-            const container = document.getElementById('chartsContainer');
+            const container = document.getElementById('patientChartsContainer');
             container.insertAdjacentHTML('afterbegin', chartHtml);
 
             const ctx = document.getElementById('hourlyChart').getContext('2d');
@@ -2063,7 +2124,7 @@
             });
         }
 
-        // 4. 실시간 분당 재실환자수 그래프
+        // 4. 실시간 분당 재실환자수 차트
         function generateRealtimeOccupancyChart() {
             console.log('🏥 실시간 분당 재실환자수 차트 생성 시작...');
             
@@ -2102,7 +2163,7 @@
                 }
 
                 const chartHtml = ChartGenerator.createChartContainer('realtimeOccupancyChart', '실시간 분당 재실환자수 분석');
-                const container = document.getElementById('chartsContainer');
+                const container = document.getElementById('patientChartsContainer');
                 container.insertAdjacentHTML('afterbegin', chartHtml);
 
                 const ctx = document.getElementById('realtimeOccupancyChart').getContext('2d');
@@ -2159,22 +2220,6 @@
                             },
                             datalabels: {
                                 display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const datasetLabel = context.dataset.label;
-                                        return `${datasetLabel}: ${context.parsed.y}명`;
-                                    },
-                                    afterLabel: function(context) {
-                                        const hour = context.dataIndex;
-                                        if (context.datasetIndex === 1) {
-                                            return `${hour}:00~${hour+1}:00 중 분당 최대값`;
-                                        } else {
-                                            return `${hour}:00~${hour+1}:00 분당 평균\n${result.metadata.totalDays}일간 실시간 계산`;
-                                        }
-                                    }
-                                }
                             }
                         },
                         scales: {
@@ -2213,7 +2258,7 @@
             }
         }
 
-        // 5. KTAS별 환자 분포
+        // 5. KTAS별 환자 분포 차트
         function generateKTASDistributionChart() {
             if (!patientData) {
                 alert('먼저 환자 데이터를 업로드해주세요.');
@@ -2230,7 +2275,7 @@
             const ktasCounts = ktasLabels.map(ktas => ktasStats[ktas]);
 
             const chartHtml = ChartGenerator.createChartContainer('ktasChart', 'KTAS별 환자 분포');
-            const container = document.getElementById('chartsContainer');
+            const container = document.getElementById('patientChartsContainer');
             container.insertAdjacentHTML('afterbegin', chartHtml);
 
             const ctx = document.getElementById('ktasChart').getContext('2d');
@@ -2251,7 +2296,7 @@
             });
         }
 
-        // 6. 입원 VS 귀가 분석
+        // 6. 입원 VS 귀가 분석 차트
         function generateAdmissionVsDischargeChart() {
             if (!patientData) {
                 alert('먼저 환자 데이터를 업로드해주세요.');
@@ -2268,7 +2313,7 @@
             const resultCounts = resultLabels.map(result => resultStats[result]);
 
             const chartHtml = ChartGenerator.createChartContainer('resultChart', '입원 VS 귀가 분석');
-            const container = document.getElementById('chartsContainer');
+            const container = document.getElementById('patientChartsContainer');
             container.insertAdjacentHTML('afterbegin', chartHtml);
 
             const ctx = document.getElementById('resultChart').getContext('2d');
@@ -2289,7 +2334,7 @@
             });
         }
 
-        // 7. 입원과별 환자수 그래프
+        // 7. 입원과별 환자수 차트
         function generateAdmissionDepartmentChart() {
             if (!patientData) {
                 alert('먼저 환자 데이터를 업로드해주세요.');
@@ -2315,7 +2360,7 @@
             const deptCounts = sortedDepts.map(dept => deptStats[dept]);
 
             const chartHtml = ChartGenerator.createChartContainer('deptChart', '입원과별 환자수 분석');
-            const container = document.getElementById('chartsContainer');
+            const container = document.getElementById('patientChartsContainer');
             container.insertAdjacentHTML('afterbegin', chartHtml);
 
             const ctx = document.getElementById('deptChart').getContext('2d');
@@ -2380,7 +2425,7 @@
             }
         }
 
-        // 8. 응급실 의사별 환자수
+        // 8. 응급실 의사별 환자수 차트
         function generateDoctorPatientChart() {
             if (!patientData) {
                 alert('먼저 환자 데이터를 업로드해주세요.');
@@ -2399,7 +2444,7 @@
             const doctorCounts = sortedDoctors.map(doctor => doctorStats[doctor]);
 
             const chartHtml = ChartGenerator.createChartContainer('doctorChart', '응급실 의사별 환자수');
-            const container = document.getElementById('chartsContainer');
+            const container = document.getElementById('patientChartsContainer');
             container.insertAdjacentHTML('afterbegin', chartHtml);
 
             const ctx = document.getElementById('doctorChart').getContext('2d');
@@ -2444,13 +2489,9 @@
             });
         }
 
-        /* ========================================
-           📦 MODULE: 차트 관리 함수들
-           ======================================== */
-
-        // 전체 차트 생성 
-        function generateAllCharts() {
-            console.log('🚀 전체 차트 생성 시작...');
+        // 전체 환자 차트 생성
+        function generateAllPatientCharts() {
+            console.log('🚀 전체 환자 차트 생성 시작...');
             
             if (!patientData) {
                 alert('먼저 환자 데이터를 업로드해주세요.');
@@ -2463,76 +2504,46 @@
             }
 
             // 기존 차트 모두 제거
-            document.getElementById('chartsContainer').innerHTML = '';
+            document.getElementById('patientChartsContainer').innerHTML = '';
             generatedCharts = {};
 
             // 차트 생성 함수들
             const chartFunctions = [
-                { func: generateDailyPatientChart, name: '일별 환자수', id: 'daily' },
-                { func: generateWeeklyAverageChart, name: '요일별 평균환자수', id: 'weekly' },
-                { func: generateHourlyAverageChart, name: '시간대별 내원환자수', id: 'hourly' },
-                { func: generateRealtimeOccupancyChart, name: '실시간 분당 재실환자수', id: 'realtime' },
-                { func: generateKTASDistributionChart, name: 'KTAS별 환자 분포', id: 'ktas' },
-                { func: generateAdmissionVsDischargeChart, name: '입원 VS 귀가 분석', id: 'admission' },
-                { func: generateAdmissionDepartmentChart, name: '입원과별 환자수', id: 'department' },
-                { func: generateDoctorPatientChart, name: '의사별 환자수', id: 'doctor' }
+                { func: generateDailyPatientChart, name: '일별 환자수' },
+                { func: generateWeeklyAverageChart, name: '요일별 평균환자수' },
+                { func: generateHourlyAverageChart, name: '시간대별 내원환자수' },
+                { func: generateRealtimeOccupancyChart, name: '실시간 분당 재실환자수' },
+                { func: generateKTASDistributionChart, name: 'KTAS별 환자 분포' },
+                { func: generateAdmissionVsDischargeChart, name: '입원 VS 귀가 분석' },
+                { func: generateAdmissionDepartmentChart, name: '입원과별 환자수' },
+                { func: generateDoctorPatientChart, name: '의사별 환자수' }
             ];
 
-            // 진행 상황 표시
-            const container = document.getElementById('chartsContainer');
-            container.innerHTML = `
-                <div class="text-center py-4 mb-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px;">
-                    <div class="spinner-academic mx-auto mb-3"></div>
-                    <h5 style="color: #1e293b;">📊 ${chartFunctions.length}개 차트 생성 중...</h5>
-                    <p class="text-muted mb-0" id="progressText">준비 중...</p>
-                </div>
-            `;
+            let successCount = 0;
+            let errorCount = 0;
 
-            // 차트 생성 시작
+            chartFunctions.forEach((chartInfo, index) => {
+                try {
+                    console.log(`📈 ${index + 1}/8: ${chartInfo.name} 생성 중...`);
+                    chartInfo.func();
+                    successCount++;
+                    console.log(`✅ ${chartInfo.name} 생성 완료`);
+                } catch (error) {
+                    errorCount++;
+                    console.error(`❌ ${chartInfo.name} 생성 오류:`, error);
+                }
+            });
+
             setTimeout(() => {
-                container.innerHTML = '';
-                let successCount = 0;
-                let errorCount = 0;
-
-                chartFunctions.forEach((chartInfo, index) => {
-                    try {
-                        console.log(`📈 ${index + 1}/${chartFunctions.length}: ${chartInfo.name} 생성 중...`);
-                        
-                        chartInfo.func();
-                        
-                        successCount++;
-                        console.log(`✅ ${chartInfo.name} 생성 완료`);
-                        
-                    } catch (error) {
-                        errorCount++;
-                        console.error(`❌ ${chartInfo.name} 생성 오류:`, error);
-                        
-                        container.innerHTML += `
-                            <div class="alert alert-warning" role="alert">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <strong>${chartInfo.name}</strong> 차트 생성 중 오류가 발생했습니다.
-                            </div>
-                        `;
-                    }
-                });
-
-                // 완료 메시지
-                setTimeout(() => {
-                    const totalGenerated = Object.keys(generatedCharts).length;
-                    console.log(`🎉 차트 생성 완료: 성공 ${successCount}개, 오류 ${errorCount}개`);
-                    
-                    if (totalGenerated > 0) {
-                        alert(`✅ 총 ${totalGenerated}개의 분석 차트가 생성되었습니다!\n\n성공: ${successCount}개\n오류: ${errorCount}개\n\n생성된 차트를 확인해보세요.`);
-                        
-                        // 실시간 데이터 저장 (차트 생성 후)
-                        if (realtimeOccupancyData) {
-                            StorageManager.saveData(patientData, analysisResults, realtimeOccupancyData);
-                        }
-                    } else {
-                        alert('❌ 차트 생성에 실패했습니다. 데이터를 다시 확인해주세요.');
-                    }
-                }, 1000);
-            }, 800);
+                const totalGenerated = Object.keys(generatedCharts).length;
+                console.log(`🎉 차트 생성 완료: 성공 ${successCount}개, 오류 ${errorCount}개`);
+                
+                if (totalGenerated > 0) {
+                    alert(`✅ 총 ${totalGenerated}개의 환자 분석 차트가 생성되었습니다!\n\n성공: ${successCount}개\n오류: ${errorCount}개`);
+                } else {
+                    alert('❌ 차트 생성에 실패했습니다. 데이터를 다시 확인해주세요.');
+                }
+            }, 1000);
         }
 
         // 개별 차트 생성 함수들에 오류 처리 추가
@@ -2541,11 +2552,6 @@
                 console.log(`📊 ${chartName} 차트 생성 시작...`);
                 chartFunction();
                 console.log(`✅ ${chartName} 차트 생성 완료`);
-                
-                // 실시간 데이터 저장 (개별 차트 생성 후)
-                if (realtimeOccupancyData) {
-                    StorageManager.saveData(patientData, analysisResults, realtimeOccupancyData);
-                }
             } catch (error) {
                 console.error(`❌ ${chartName} 차트 생성 오류:`, error);
                 alert(`${chartName} 차트 생성 중 오류가 발생했습니다:\n${error.message}`);
@@ -2553,92 +2559,414 @@
         }
 
         /* ========================================
-           📦 MODULE: 데이터 내보내기 함수들
+           📦 MODULE: 스케줄 관리 함수들
            ======================================== */
-        function exportPatientData() {
-            if (!patientData || !analysisResults) {
-                alert('내보낼 데이터가 없습니다.');
-                return;
-            }
+        function loadSampleSchedule() {
+            const sampleData = `1|화|이||강|강|정|
+2|수|허||박|박|강|
+3|목|권||강|오|선|
+4|금|오||박|박|허|
+5|토|선||강|강|권|
+6|일|박|이2|||허|이
+7|월|선||강|이2|이|`;
 
-            const exportData = {
-                _meta: {
-                    exportTime: new Date().toISOString(),
-                    systemName: "ER-Monitoring-Academic-Shared",
-                    description: "응급실 환자 데이터 분석 결과 (공유 버전)",
-                    version: "2.0-shared"
-                },
-                statistics: analysisResults,
-                patientData: patientData,
-                realtimeOccupancyData: realtimeOccupancyData,
-                summary: {
-                    totalRecords: patientData.length,
-                    dataQuality: "검증 완료",
-                    readyForAnalysis: true,
-                    sharingEnabled: isDataShared
-                }
-            };
-
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ER_Patient_Analysis_Shared_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+            document.getElementById('scheduleData').value = sampleData;
         }
 
-        function exportAllChartsData() {
-            if (!patientData || Object.keys(generatedCharts).length === 0) {
-                alert('생성된 차트가 없습니다. 먼저 차트를 생성해주세요.');
+        function processScheduleData() {
+            const rawData = document.getElementById('scheduleData').value.trim();
+            
+            if (!rawData) {
+                alert('스케줄 데이터를 입력해주세요.');
                 return;
             }
 
-            const chartsData = {};
-            Object.keys(generatedCharts).forEach(chartId => {
-                const chart = generatedCharts[chartId];
-                chartsData[chartId] = {
-                    type: chart.config.type,
-                    data: chart.data,
-                    options: chart.options
-                };
+            try {
+                scheduleData = ScheduleManager.parseScheduleData(rawData);
+                displayScheduleTable();
+                
+                // 스케줄 데이터 저장
+                DataManager.saveData(scheduleData, '근무스케줄_' + new Date().toLocaleDateString(), 'schedule');
+                refreshDataList();
+                
+                document.getElementById('scheduleResults').style.display = 'block';
+                
+            } catch (error) {
+                alert('스케줄 데이터 처리 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        function displayScheduleTable() {
+            const table = document.getElementById('scheduleTable');
+            
+            let html = `
+                <thead>
+                    <tr>
+                        <th>날짜</th>
+                        <th>요일</th>
+                        <th>Day 1</th>
+                        <th>Day 2</th>
+                        <th>MDH</th>
+                        <th>MD</th>
+                        <th>Night 1</th>
+                        <th>Night 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            const sortedDays = Object.keys(scheduleData).sort((a, b) => parseInt(a) - parseInt(b));
+
+            sortedDays.forEach(day => {
+                const data = scheduleData[day];
+                const isWeekend = data.day === '토' || data.day === '일';
+                const rowClass = isWeekend ? 'weekend-row' : '';
+                
+                html += `
+                    <tr class="${rowClass}">
+                        <td><strong>${day}</strong></td>
+                        <td><strong>${data.day}</strong></td>
+                        <td>${data.d1 || ''}</td>
+                        <td>${data.d2 || ''}</td>
+                        <td>${data.mdh || ''}</td>
+                        <td>${data.md || ''}</td>
+                        <td>${data.n1 || ''}</td>
+                        <td>${data.n2 || ''}</td>
+                    </tr>
+                `;
             });
 
-            const exportData = {
-                _meta: {
-                    exportTime: new Date().toISOString(),
-                    systemName: "ER-Monitoring-Academic-Charts-Shared",
-                    description: "응급실 분석 차트 데이터 (공유 버전)",
-                    chartsGenerated: Object.keys(generatedCharts).length,
-                    version: "2.0-shared"
-                },
-                patientStatistics: analysisResults,
-                chartConfigurations: chartsData,
-                realtimeOccupancyData: realtimeOccupancyData,
-                rawPatientData: patientData,
-                analysisTypes: [
-                    "일별 환자수", "요일별 평균환자수", "시간대별 내원환자수", "실시간 분당 재실환자수",
-                    "KTAS별 환자 분포", "입원 VS 귀가", "입원과별 환자수", "의사별 환자수"
-                ],
-                sharing: {
-                    enabled: isDataShared,
-                    githubReady: true,
-                    collaborativeAnalysis: true
-                }
-            };
-
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ER_Academic_Charts_Shared_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-
-            alert('✅ 모든 분석 차트 데이터가 공유 버전으로 내보내기되었습니다!\n\nGitHub에서 다른 연구자들과 공유할 수 있습니다.');
+            html += '</tbody>';
+            table.innerHTML = html;
         }
 
-        console.log('🏥 통합된 응급실 운영 모니터링 시스템 (데이터 공유 버전) 로드 완료');
+        // 의사별 총 근무시간 차트 생성
+        function generateDoctorWorkHoursChart() {
+            if (!scheduleData || Object.keys(scheduleData).length === 0) {
+                alert('먼저 스케줄 데이터를 처리해주세요.');
+                return;
+            }
+
+            console.log('📊 의사별 총 근무시간 차트 생성 중...');
+
+            const workHours = ScheduleManager.calculateTotalWorkHours(scheduleData);
+            const staffList = Object.keys(workHours).filter(staff => workHours[staff] > 0);
+            const totalHours = staffList.map(staff => workHours[staff]);
+
+            const chartHtml = ChartGenerator.createChartContainer('doctorWorkHoursChart', '의사별 총 근무시간 분석');
+            const container = document.getElementById('scheduleChartsContainer');
+            container.innerHTML = chartHtml;
+
+            const ctx = document.getElementById('doctorWorkHoursChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                plugins: [ChartDataLabels],
+                data: {
+                    labels: staffList,
+                    datasets: [{
+                        label: '총 근무시간 (시간)',
+                        data: totalHours,
+                        backgroundColor: ChartGenerator.getAcademicColorPalette(staffList.length),
+                        borderColor: '#1e293b',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...ChartGenerator.getCommonOptions('의사별 총 근무시간', true),
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '근무시간 (시간)',
+                                font: { size: 12, weight: '600' }
+                            },
+                            grid: { color: '#e2e8f0' },
+                            ticks: { font: { size: 11 } }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '의사명',
+                                font: { size: 12, weight: '600' }
+                            },
+                            grid: { color: '#e2e8f0' },
+                            ticks: { font: { size: 11 } }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '의사별 총 근무시간 (D: 10h, MDH: 4h, MD: 9h, N: 14h)',
+                            font: { size: 16, weight: '600' },
+                            color: '#1e293b',
+                            padding: 20
+                        },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { size: 12, weight: '500' },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            font: { weight: '600', size: 11 },
+                            color: '#1e293b',
+                            formatter: function(value, context) {
+                                return value + 'h';
+                            }
+                        }
+                    }
+                }
+            });
+
+            console.log('✅ 의사별 총 근무시간 차트 생성 완료');
+        }
+
+        function generateWorkloadAnalysis() {
+            if (!scheduleData || Object.keys(scheduleData).length === 0) {
+                alert('먼저 스케줄 데이터를 처리해주세요.');
+                return;
+            }
+
+            const workloadStats = ScheduleManager.calculateWorkloadStats(scheduleData);
+            const staffList = Object.keys(workloadStats).filter(staff => workloadStats[staff].total > 0);
+            const totalShifts = staffList.map(staff => workloadStats[staff].total);
+
+            const chartHtml = ChartGenerator.createChartContainer('workloadAnalysisChart', '근무량 분석 (근무 횟수)');
+            const container = document.getElementById('scheduleChartsContainer');
+            container.innerHTML += chartHtml;
+
+            const ctx = document.getElementById('workloadAnalysisChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                plugins: [ChartDataLabels],
+                data: {
+                    labels: staffList,
+                    datasets: [{
+                        label: '총 근무 횟수',
+                        data: totalShifts,
+                        backgroundColor: ChartGenerator.getAcademicColorPalette(staffList.length),
+                        borderColor: '#1e293b',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...ChartGenerator.getCommonOptions('의사별 총 근무 횟수', true),
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '근무 횟수',
+                                font: { size: 12, weight: '600' }
+                            },
+                            grid: { color: '#e2e8f0' },
+                            ticks: { font: { size: 11 } }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '의사명',
+                                font: { size: 12, weight: '600' }
+                            },
+                            grid: { color: '#e2e8f0' },
+                            ticks: { font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        /* ========================================
+           📦 MODULE: 데이터 관리 함수들
+           ======================================== */
+        function refreshDataList() {
+            const dataKeys = DataManager.getStoredDataKeys();
+            const container = document.getElementById('dataList');
+            
+            // 임시 메모리 데이터도 포함
+            const tempKeys = window.tempDataStorage ? Object.keys(window.tempDataStorage) : [];
+            const allKeys = [...dataKeys, ...tempKeys];
+            
+            if (allKeys.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-2x mb-3"></i><br>
+                        아직 업로드된 데이터가 없습니다.
+                    </div>
+                `;
+                return;
+            }
+
+            // 저장소 상태 표시
+            const storageStatus = DataManager.getStorageStatus();
+            let statusHtml = '';
+            
+            if (storageStatus.temporaryDatasets > 0) {
+                statusHtml = `
+                    <div class="alert alert-warning alert-sm mb-3" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>저장소 알림:</strong> ${storageStatus.temporaryDatasets}개 데이터가 임시 메모리에 저장되어 있습니다.
+                        <br><small>페이지를 새로고침하면 임시 데이터가 사라집니다.</small>
+                    </div>
+                `;
+            }
+
+            let html = statusHtml;
+            
+            // 영구 저장된 데이터
+            dataKeys.forEach(key => {
+                const data = DataManager.loadData(key);
+                if (data) {
+                    const isSelected = key === selectedDataKey ? 'selected' : '';
+                    const storageType = '💾 영구저장';
+                    
+                    html += `
+                        <div class="data-item ${isSelected}" onclick="selectData('${key}')">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        ${data.name} 
+                                        <small class="badge bg-success">${storageType}</small>
+                                    </h6>
+                                    <small class="text-muted">${data.type} | ${new Date(data.timestamp).toLocaleString()}</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteData('${key}', event)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 임시 메모리 데이터
+            tempKeys.forEach(key => {
+                const data = window.tempDataStorage[key];
+                if (data) {
+                    const isSelected = key === selectedDataKey ? 'selected' : '';
+                    const storageType = '📝 임시저장';
+                    
+                    html += `
+                        <div class="data-item ${isSelected}" onclick="selectData('${key}')">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        ${data.name} 
+                                        <small class="badge bg-warning text-dark">${storageType}</small>
+                                    </h6>
+                                    <small class="text-muted">${data.type} | ${new Date(data.timestamp).toLocaleString()}</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteData('${key}', event)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function selectData(key) {
+            selectedDataKey = key;
+            const data = DataManager.loadData(key);
+            
+            if (data) {
+                // 선택된 데이터 정보 표시
+                document.getElementById('selectedDataInfo').style.display = 'block';
+                document.getElementById('dataInfoContent').innerHTML = `
+                    <h6>${data.name}</h6>
+                    <p><strong>타입:</strong> ${data.type}</p>
+                    <p><strong>업로드 시간:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                    <p><strong>데이터 크기:</strong> ${Array.isArray(data.data) ? data.data.length + '개 레코드' : '1개 객체'}</p>
+                `;
+                
+                refreshDataList();
+            }
+        }
+
+        function analyzeSelectedData() {
+            if (!selectedDataKey) {
+                alert('먼저 분석할 데이터를 선택해주세요.');
+                return;
+            }
+
+            const data = DataManager.loadData(selectedDataKey);
+            if (!data) {
+                alert('선택된 데이터를 불러올 수 없습니다.');
+                return;
+            }
+
+            if (data.type === 'patient') {
+                patientData = data.data;
+                analysisResults = PatientAnalyzer.generateSummaryStats(patientData);
+                displayPatientAnalysis();
+                
+                // 환자 데이터 분석 탭으로 이동
+                const patientTab = new bootstrap.Tab(document.getElementById('patient-tab'));
+                patientTab.show();
+                
+                alert('✅ 선택된 환자 데이터로 분석을 시작합니다.');
+                
+            } else if (data.type === 'schedule') {
+                scheduleData = data.data;
+                displayScheduleTable();
+                document.getElementById('scheduleResults').style.display = 'block';
+                
+                // 스케줄 관리 탭으로 이동
+                const scheduleTab = new bootstrap.Tab(document.getElementById('schedule-tab'));
+                scheduleTab.show();
+                
+                alert('✅ 선택된 스케줄 데이터로 분석을 시작합니다.');
+            }
+        }
+
+        function deleteData(key, event) {
+            event.stopPropagation();
+            
+            if (confirm('이 데이터를 삭제하시겠습니까?')) {
+                const success = DataManager.deleteData(key);
+                if (success) {
+                    if (selectedDataKey === key) {
+                        selectedDataKey = null;
+                        document.getElementById('selectedDataInfo').style.display = 'none';
+                    }
+                    refreshDataList();
+                    alert('✅ 데이터가 삭제되었습니다.');
+                } else {
+                    alert('❌ 데이터 삭제에 실패했습니다.');
+                }
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('모든 저장된 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
+                DataManager.clearAllData();
+                selectedDataKey = null;
+                patientData = null;
+                scheduleData = {};
+                
+                // UI 초기화
+                document.getElementById('selectedDataInfo').style.display = 'none';
+                document.getElementById('patientAnalysisResults').style.display = 'none';
+                document.getElementById('scheduleResults').style.display = 'none';
+                document.getElementById('patientChartsContainer').innerHTML = '';
+                document.getElementById('scheduleChartsContainer').innerHTML = '';
+                
+                refreshDataList();
+                alert('✅ 모든 데이터가 삭제되었습니다.');
+            }
+        }
+
+        console.log('🏥 응급실 통합 모니터링 시스템 로드 완료');
     </script>
 </body>
 </html>
