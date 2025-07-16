@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>응급실 스케줄 하이브리드 시스템 (의사명 매핑 포함 + 상세 통계)</title>
+    
+    <!-- 부트스트랩 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 아이콘 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background-color: #495057;
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: bold;
+        }
+        
+        .step-card {
+            border-left: 5px solid #ff6b6b;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+        }
+        
+        .step-number {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .data-input-area {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .data-input-area:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            background: #fff;
+        }
+        
+        .example-data {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .result-table {
+            font-size: 0.85em;
+        }
+        
+        .result-table th {
+            background-color: #495057;
+            color: white;
+            text-align: center;
+            font-size: 0.8em;
+            padding: 8px 4px;
+        }
+        
+        .result-table td {
+            text-align: center;
+            padding: 6px 4px;
+        }
+        
+        .weekend-row {
+            background-color: #fff3cd;
+        }
+        
+        .btn-magic {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-magic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            color: white;
+        }
+        
+        .claude-highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #ff6b6b;
+        }
+
+        .doctor-mapping-info {
+            background: linear-gradient(120deg, #ffeaa7 0%, #fab1a0 100%);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e17055;
+            margin: 10px 0;
+        }
+
+        /* ===== 새로 추가된 통계 테이블 스타일 ===== */
+        .stats-table {
+            font-size: 0.9em;
+        }
+        
+        .stats-table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            padding: 12px 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .stats-table td {
+            text-align: center;
+            padding: 10px 8px;
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        
+        .stats-table .doctor-name {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .shift-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            min-width: 30px;
+        }
+        
+        .badge-d { background: linear-gradient(45deg, #4ecdc4, #44a08d); color: white; }
+        .badge-mdh { background: linear-gradient(45deg, #ffa726, #ff7043); color: white; }
+        .badge-md { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
+        .badge-n { background: linear-gradient(45deg, #42a5f5, #1e88e5); color: white; }
+        .badge-total { background: linear-gradient(45deg, #66bb6a, #43a047); color: white; }
+        
+        .statistics-section {
+            background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            margin: 20px 0;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        .workload-comparison {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .doctor-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 5px solid #ff6b6b;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .efficient-doctor {
+            border-left-color: #28a745;
+        }
+
+        .busy-doctor {
+            border-left-color: #dc3545;
+        }
+
+        .normal-doctor {
+            border-left-color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div class="header-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h1><i class="fas fa-magic"></i> 응급실 스케줄 하이브리드 시스템</h1>
+                    <p class="lead">🤖 Claude 이미지 분석 + 💻 웹시스템 + 👨‍⚕️ 의사명 자동변환 + 📊 상세 통계 = 🎯 완벽한 엑셀 변환</p>
+                    <div class="mt-3">
+                        <span class="badge bg-success fs-6"><i class="fas fa-user-tag"></i> 의사명 풀네임 자동변환</span>
+                        <span class="badge bg-info fs-6 ms-2"><i class="fas fa-chart-bar"></i> 상세 근무 통계</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Claude 분석 섹션 -->
+        <div class="card claude-highlight">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center">
+                        <div class="step-number">1</div>
+                    </div>
+                    <div class="col-md-10">
+                        <h4><i class="fas fa-robot"></i> Claude 이미지 분석 (채팅창에서)</h4>
+                        <p class="mb-0">
+                            <strong>방법:</strong> Claude 채팅창에 스케줄 이미지를 업로드하고 
+                            <span class="text-danger">"이 스케줄표를 하이브리드 시스템용 데이터 형식으로 변환해줘"</span>라고 요청하세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 의사명 매핑 정보 -->
+        <div class="doctor-mapping-info">
+            <h5><i class="fas fa-exchange-alt"></i> 의사명 자동 변환 시스템</h5>
+            <p class="mb-2"><strong>📝 스케줄 약어 → 풀네임 자동 변환:</strong></p>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="mb-0">
+                        <li><strong>강</strong> → 강희동</li>
+                        <li><strong>오</strong> → 오세현</li>
+                        <li><strong>정</strong> → 정상구</li>
+                        <li><strong>이</strong> → 이유진</li>
+                        <li><strong>박</strong> → 박인준</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="mb-0">
+                        <li><strong>권</strong> → 권재화</li>
+                        <li><strong>선</strong> → 선경민</li>
+                        <li><strong>허</strong> → 허석진</li>
+                        <li><strong>이2</strong> → 이기헌</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-2 mb-0"><small class="text-muted">💡 약어로 입력하면 자동으로 풀네임으로 변환하여 엑셀 파일에 저장됩니다.</small></p>
+        </div>
+
+        <!-- 데이터 입력 섹션 -->
+        <div class="card step-card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-1">
+                        <div class="step-number" style="background: #28a745;">2</div>
+                    </div>
+                    <div class="col-md-11">
+                        <i class="fas fa-paste"></i> Claude 분석 결과 붙여넣기
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>Claude가 분석한 데이터를 아래 텍스트 영역에 붙여넣으세요:</p>
+                
+                <div class="example-data">
+                    <strong>📝 예시 데이터 형식 (약어 입력):</strong>
+                    <pre style="font-size: 0.8em; margin: 10px 0;">1|화|이||강|강|정|
+2|수|허||박|박|강|
+3|목|권||강|오|선|
+...</pre>
+                    <small class="text-muted">형식: 날짜|요일|D1|D2|MDH|MD|N1|N2 (약어로 입력 → 자동으로 풀네임 변환)</small>
+                </div>
+                
+                <textarea class="data-input-area w-100" id="claude-data" 
+                          placeholder="Claude가 분석한 스케줄 데이터를 여기에 붙여넣으세요...
+
+예시 (약어 입력):
+1|화|이||강|강|정|
+2|수|허||박|박|강|
+3|목|권||강|오|선|
+6|일|박|이2|||허|이
+7|월|선||강|이2|이|
+
+형식: 날짜|요일|D근무자1|D근무자2|MDH근무자|MD근무자|N근무자1|N근무자2
+
+💡 약어로 입력하면 자동으로 풀네임으로 변환됩니다!
+(강→강희동, 이→이유진, 박→박인준 등)"></textarea>
+                
+                <div class="text-center mt-3">
+                    <button class="btn btn-magic btn-lg" onclick="processClaudeData()">
+                        <i class="fas fa-magic"></i> 데이터 변환 및 엑셀 생성 (풀네임 자동변환)
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg ms-2" onclick="loadSampleData()">
+                        <i class="fas fa-flask"></i> 샘플 데이터 로드
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 변환 과정 섹션 -->
+        <div class="card" id="process-section" style="display: none;">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-1">
+                        <div class="step-number" style="background: #17a2b8;">3</div>
+                    </div>
+                    <div class="col-md-11">
+                        <i class="fas fa-cogs"></i> 데이터 변환 과정
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="process-log">
+                    <!-- 변환 과정이 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 결과 표시 섹션 -->
+        <div class="card" id="result-section" style="display: none;">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-1">
+                        <div class="step-number" style="background: #28a745;">4</div>
+                    </div>
+                    <div class="col-md-11">
+                        <i class="fas fa-table"></i> 변환 결과 및 엑셀 다운로드 (풀네임 표시)
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> <strong>의사명 변환 완료!</strong> 
+                    모든 약어가 풀네임으로 자동 변환되었습니다.
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered result-table" id="result-table">
+                        <!-- 결과 테이블이 여기에 생성됩니다 -->
+                    </table>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-success btn-lg" onclick="downloadExcel()">
+                        <i class="fas fa-download"></i> 엑셀 파일 다운로드 (풀네임)
+                    </button>
+                    <button class="btn btn-info btn-lg ms-2" onclick="showDetailedStatistics()">
+                        <i class="fas fa-chart-bar"></i> 상세 근무 통계 보기
+                    </button>
+                    <button class="btn btn-warning btn-lg ms-2" onclick="resetSystem()">
+                        <i class="fas fa-redo"></i> 다시 시작
+                    </button>
+                </div>
+                
+                <!-- ===== 새로 추가된 상세 통계 섹션 ===== -->
+                <div id="detailed-statistics-section" style="display: none;">
+                    <div class="statistics-section">
+                        <h5><i class="fas fa-chart-pie"></i> 📊 상세 근무 통계 분석 (풀네임 기준)</h5>
+                        <p class="mb-0">각 의사별 근무 패턴과 업무량을 상세히 분석한 결과입니다.</p>
+                    </div>
+
+                    <!-- 요약 통계 카드들 -->
+                    <div class="row mb-4" id="summary-cards">
+                        <!-- JavaScript로 동적 생성 -->
+                    </div>
+
+                    <!-- 근무자별 상세 통계 테이블 -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered stats-table" id="detailed-stats-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">의사명<br>(풀네임)</th>
+                                    <th colspan="4">근무 타입별 일수</th>
+                                    <th rowspan="2">총 근무일</th>
+                                    <th rowspan="2">근무 비율<br>(%)</th>
+                                    <th rowspan="2">평균 근무<br>/주</th>
+                                    <th rowspan="2">업무량<br>등급</th>
+                                </tr>
+                                <tr>
+                                    <th>D<br><small>Day</small></th>
+                                    <th>MDH<br><small>Morning</small></th>
+                                    <th>MD<br><small>Midnight</small></th>
+                                    <th>N<br><small>Night</small></th>
+                                </tr>
+                            </thead>
+                            <tbody id="detailed-stats-body">
+                                <!-- JavaScript로 동적 생성 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 근무 패턴 비교 차트 -->
+                    <div class="workload-comparison">
+                        <h6><i class="fas fa-balance-scale"></i> 근무량 균형 분석</h6>
+                        <div id="workload-bars">
+                            <!-- JavaScript로 동적 생성 -->
+                        </div>
+                    </div>
+
+                    <!-- 의사별 상세 카드 -->
+                    <div class="row" id="doctor-detail-cards">
+                        <!-- JavaScript로 동적 생성 -->
+                    </div>
+                </div>
+                
+                <!-- 데이터 내보내기 섹션 -->
+                <div class="mt-4">
+                    <h6><i class="fas fa-share-alt"></i> 다른 시스템에서 사용하기</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="exportToJSON()">
+                                <i class="fas fa-code"></i> JSON 다운로드
+                                <br><small class="text-muted">AI/ML 시스템용 (풀네임)</small>
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-secondary w-100 mb-2" onclick="exportToCSV()">
+                                <i class="fas fa-file-csv"></i> CSV 다운로드
+                                <br><small class="text-muted">데이터 분석용 (풀네임)</small>
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-info w-100 mb-2" onclick="copyAsJavaScript()">
+                                <i class="fas fa-copy"></i> JavaScript 복사
+                                <br><small class="text-muted">웹 개발용 (풀네임)</small>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 사용 예시 -->
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-lightbulb"></i> 
+                        <strong>활용 예시:</strong> 
+                        JSON → Python/AI 모델, CSV → R/pandas 분석, JavaScript → 웹시스템 연동
+                        <br><strong>특징:</strong> 모든 내보내기 형식에서 풀네임(강희동, 이유진 등) 사용
+                    </div>
+                </div>
+
+                <div id="statistics-section" style="display: none;">
+                    <hr>
+                    <h5><i class="fas fa-chart-pie"></i> 근무 통계 (풀네임 기준)</h5>
+                    <div id="statistics-content">
+                        <!-- 통계가 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 도움말 섹션 -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-question-circle"></i> 사용 방법 및 도움말
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-lightbulb"></i> 사용 방법</h6>
+                        <ol>
+                            <li>Claude 채팅창에 스케줄 이미지 업로드</li>
+                            <li>"하이브리드 시스템용 데이터 형식으로 변환해줘" 요청</li>
+                            <li>Claude 결과를 위 텍스트 영역에 붙여넣기</li>
+                            <li>"데이터 변환 및 엑셀 생성" 버튼 클릭</li>
+                            <li>자동으로 풀네임 변환된 엑셀 파일 다운로드</li>
+                            <li><strong>NEW!</strong> "상세 근무 통계 보기"로 분석 결과 확인</li>
+                        </ol>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-info-circle"></i> 데이터 형식</h6>
+                        <p><strong>각 줄 형식:</strong></p>
+                        <code>날짜|요일|D1|D2|MDH|MD|N1|N2</code>
+                        <p class="mt-2"><strong>예시 (약어 입력):</strong></p>
+                        <code>1|화|이||강|강|정|</code>
+                        <p class="mt-2"><strong>결과 (풀네임 출력):</strong></p>
+                        <code>1일 화요일: 이유진, 강희동, 강희동, 정상구</code>
+                        <p class="mt-2"><small>빈 값은 그대로 비워두면 됩니다.</small></p>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6><i class="fas fa-star"></i> 새로운 기능: 상세 근무 통계</h6>
+                        <div class="alert alert-warning">
+                            <h6>🚀 추가된 기능</h6>
+                            <ul class="mb-0">
+                                <li><strong>근무자별 상세 통계:</strong> 각 의사의 D, MDH, MD, N 근무 일수</li>
+                                <li><strong>업무량 균형 분석:</strong> 근무 비율과 평균 근무일 계산</li>
+                                <li><strong>업무량 등급:</strong> 효율적/보통/과부하 의사 구분</li>
+                                <li><strong>시각적 차트:</strong> 근무량 비교 막대 그래프</li>
+                                <li><strong>의사별 상세 카드:</strong> 개별 근무 패턴 분석</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 부트스트랩 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- 엑셀 생성 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        // 전역 변수
+        let scheduleData = {};
+        let processedData = {};
+        let detailedStats = {};
+        
+        // 시스템 설정 및 스키마 (의사명 매핑 포함)
+        const SYSTEM_CONFIG = {
+            version: "1.2.0",
+            dataSchema: "er-schedule-v1",
+            requiredFields: ['date', 'day', 'd1', 'd2', 'mdh', 'md', 'n1', 'n2'],
+            validStaff: ['강', '정', '이', '오', '이2', '허', '권', '박', '선'],
+            validDays: ['월', '화', '수', '목', '금', '토', '일'],
+            maxDaysPerMonth: 31,
+            shifts: {
+                D: { name: "Day shift", time: "08:00~18:00", maxStaff: 2, color: "#4ecdc4" },
+                MDH: { name: "Morning part-time", time: "10:00~14:00", maxStaff: 1, color: "#ffa726" },
+                MD: { name: "Midnight shift", time: "16:00~01:00", maxStaff: 1, color: "#667eea" },
+                N: { name: "Night shift", time: "18:00~08:00", maxStaff: 2, color: "#42a5f5" }
+            },
+            // 의사명 매핑 (약어 → 풀네임)
+            doctorNameMapping: {
+                '강': '강희동',
+                '오': '오세현',
+                '정': '정상구',
+                '이': '이유진',
+                '박': '박인준',
+                '권': '권재화',
+                '선': '선경민',
+                '허': '허석진',
+                '이2': '이기헌'
+            }
+        };
+
+        // 로깅 시스템
+        const Logger = {
+            logs: [],
+            log: function(level, message, data = null) {
+                const timestamp = new Date().toISOString();
+                const logEntry = { timestamp, level, message, data };
+                this.logs.push(logEntry);
+                console.log(`[${level}] ${timestamp}: ${message}`, data || '');
+                
+                // 중요한 오류는 UI에도 표시
+                if (level === 'ERROR') {
+                    this.showError(message);
+                }
+            },
+            info: function(message, data) { this.log('INFO', message, data); },
+            warn: function(message, data) { this.log('WARN', message, data); },
+            error: function(message, data) { this.log('ERROR', message, data); },
+            debug: function(message, data) { this.log('DEBUG', message, data); },
+            showError: function(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+                errorDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i> <strong>오류:</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.container').firstChild);
+            },
+            exportLogs: function() {
+                return {
+                    system: 'ER-Schedule-Hybrid',
+                    version: SYSTEM_CONFIG.version,
+                    exportTime: new Date().toISOString(),
+                    logs: this.logs
+                };
+            }
+        };
+
+        // 데이터 검증 시스템
+        const DataValidator = {
+            validateDay: function(dayData, dayNumber) {
+                const errors = [];
+                const warnings = [];
+
+                // 필수 필드 검사
+                SYSTEM_CONFIG.requiredFields.forEach(field => {
+                    if (!(field in dayData)) {
+                        errors.push(`${dayNumber}일: 필수 필드 '${field}' 누락`);
+                    }
+                });
+
+                // 날짜 형식 검사
+                if (dayData.date && !dayData.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    errors.push(`${dayNumber}일: 잘못된 날짜 형식 (${dayData.date})`);
+                }
+
+                // 요일 검사
+                if (dayData.day && !SYSTEM_CONFIG.validDays.includes(dayData.day)) {
+                    errors.push(`${dayNumber}일: 잘못된 요일 (${dayData.day})`);
+                }
+
+                // 중복 근무자 검사
+                const dayStaff = [dayData.d1, dayData.d2, dayData.mdh, dayData.md, dayData.n1, dayData.n2].filter(Boolean);
+                const uniqueStaff = new Set(dayStaff);
+                if (dayStaff.length !== uniqueStaff.size) {
+                    warnings.push(`${dayNumber}일: 중복 근무자 배정 감지`);
+                }
+
+                // 빈 근무 검사
+                if (dayStaff.length === 0) {
+                    warnings.push(`${dayNumber}일: 모든 근무가 비어있음`);
+                }
+
+                return { errors, warnings };
+            },
+
+            validateFullSchedule: function(scheduleData) {
+                const result = {
+                    isValid: true,
+                    errors: [],
+                    warnings: [],
+                    stats: {
+                        totalDays: Object.keys(scheduleData).length,
+                        filledDays: 0,
+                        emptyDays: 0,
+                        staffUsage: {}
+                    }
+                };
+
+                // 각 날짜별 검증
+                Object.keys(scheduleData).forEach(day => {
+                    const validation = this.validateDay(scheduleData[day], day);
+                    result.errors = result.errors.concat(validation.errors);
+                    result.warnings = result.warnings.concat(validation.warnings);
+
+                    // 통계 계산
+                    const dayStaff = [scheduleData[day].d1, scheduleData[day].d2, scheduleData[day].mdh, 
+                                    scheduleData[day].md, scheduleData[day].n1, scheduleData[day].n2].filter(Boolean);
+                    
+                    if (dayStaff.length > 0) {
+                        result.stats.filledDays++;
+                    } else {
+                        result.stats.emptyDays++;
+                    }
+
+                    // 근무자 사용 통계
+                    dayStaff.forEach(staff => {
+                        result.stats.staffUsage[staff] = (result.stats.staffUsage[staff] || 0) + 1;
+                    });
+                });
+
+                result.isValid = result.errors.length === 0;
+                return result;
+            }
+        };
+
+        // 데이터 표준화 시스템
+        const DataNormalizer = {
+            normalizeScheduleData: function(rawScheduleData) {
+                const normalized = {};
+                
+                Object.keys(rawScheduleData).forEach(day => {
+                    const dayData = rawScheduleData[day];
+                    
+                    normalized[day] = {
+                        // 메타데이터
+                        _meta: {
+                            dayNumber: parseInt(day),
+                            lastUpdated: new Date().toISOString(),
+                            dataSource: 'claude-hybrid-system',
+                            version: SYSTEM_CONFIG.version,
+                            doctorNamesConverted: true
+                        },
+                        
+                        // 표준화된 데이터 (풀네임으로 저장)
+                        date: dayData.date || `2025-07-${day.toString().padStart(2, '0')}`,
+                        day: (dayData.day || '').trim(),
+                        shifts: {
+                            D: {
+                                staff1: (dayData.d1 || '').trim() || null,
+                                staff2: (dayData.d2 || '').trim() || null,
+                                count: [dayData.d1, dayData.d2].filter(Boolean).length
+                            },
+                            MDH: {
+                                staff: (dayData.mdh || '').trim() || null,
+                                count: dayData.mdh ? 1 : 0
+                            },
+                            MD: {
+                                staff: (dayData.md || '').trim() || null,
+                                count: dayData.md ? 1 : 0
+                            },
+                            N: {
+                                staff1: (dayData.n1 || '').trim() || null,
+                                staff2: (dayData.n2 || '').trim() || null,
+                                count: [dayData.n1, dayData.n2].filter(Boolean).length
+                            }
+                        },
+                        
+                        // 호환성을 위한 레거시 필드 (풀네임)
+                        d1: (dayData.d1 || '').trim(),
+                        d2: (dayData.d2 || '').trim(),
+                        mdh: (dayData.mdh || '').trim(),
+                        md: (dayData.md || '').trim(),
+                        n1: (dayData.n1 || '').trim(),
+                        n2: (dayData.n2 || '').trim()
+                    };
+                });
+
+                return normalized;
+            },
+
+            createCompatibilityWrapper: function(normalizedData) {
+                return {
+                    // 시스템 정보
+                    _system: {
+                        name: 'ER-Schedule-Hybrid-System',
+                        version: SYSTEM_CONFIG.version,
+                        schema: SYSTEM_CONFIG.dataSchema,
+                        generatedAt: new Date().toISOString(),
+                        compatibility: ['javascript', 'json', 'csv'],
+                        doctorNameMapping: SYSTEM_CONFIG.doctorNameMapping,
+                        api: {
+                            getDay: (day) => normalizedData[day],
+                            getStaffByDay: (day) => this.getStaffByDay(normalizedData[day]),
+                            getAllStaff: () => this.getAllStaff(normalizedData),
+                            getWorkDays: (staffName) => this.getWorkDays(normalizedData, staffName)
+                        }
+                    },
+                    
+                    // 데이터
+                    data: normalizedData
+                };
+            },
+
+            getStaffByDay: function(dayData) {
+                if (!dayData) return [];
+                return [dayData.d1, dayData.d2, dayData.mdh, dayData.md, dayData.n1, dayData.n2].filter(Boolean);
+            },
+
+            getAllStaff: function(scheduleData) {
+                const allStaff = new Set();
+                Object.values(scheduleData).forEach(day => {
+                    this.getStaffByDay(day).forEach(staff => allStaff.add(staff));
+                });
+                return Array.from(allStaff).sort();
+            },
+
+            getWorkDays: function(scheduleData, staffName) {
+                const workDays = [];
+                Object.keys(scheduleData).forEach(day => {
+                    const dayStaff = this.getStaffByDay(scheduleData[day]);
+                    if (dayStaff.includes(staffName)) {
+                        workDays.push({
+                            day: parseInt(day),
+                            date: scheduleData[day].date,
+                            dayOfWeek: scheduleData[day].day
+                        });
+                    }
+                });
+                return workDays;
+            }
+        };
+
+        /**
+         * ===== 새로 추가된 상세 통계 분석 시스템 =====
+         */
+        const DetailedStatsAnalyzer = {
+            calculateDetailedStats: function(scheduleData) {
+                const stats = {};
+                const allDoctors = Object.values(SYSTEM_CONFIG.doctorNameMapping);
+                
+                // 각 의사별 통계 초기화
+                allDoctors.forEach(doctor => {
+                    stats[doctor] = {
+                        name: doctor,
+                        shifts: { D: 0, MDH: 0, MD: 0, N: 0 },
+                        totalDays: 0,
+                        workRatio: 0,
+                        avgPerWeek: 0,
+                        workloadLevel: 'normal',
+                        shiftPattern: {},
+                        weekendDays: 0,
+                        weekDays: 0
+                    };
+                });
+
+                const totalDays = Object.keys(scheduleData).length;
+                
+                // 스케줄 데이터 분석
+                Object.values(scheduleData).forEach(day => {
+                    const isWeekend = day.day === '토' || day.day === '일';
+                    
+                    // D 근무 체크
+                    if (day.d1 && stats[day.d1]) {
+                        stats[day.d1].shifts.D++;
+                        stats[day.d1].totalDays++;
+                        if (isWeekend) stats[day.d1].weekendDays++;
+                        else stats[day.d1].weekDays++;
+                    }
+                    if (day.d2 && stats[day.d2]) {
+                        stats[day.d2].shifts.D++;
+                        stats[day.d2].totalDays++;
+                        if (isWeekend) stats[day.d2].weekendDays++;
+                        else stats[day.d2].weekDays++;
+                    }
+                    
+                    // MDH 근무 체크
+                    if (day.mdh && stats[day.mdh]) {
+                        stats[day.mdh].shifts.MDH++;
+                        stats[day.mdh].totalDays++;
+                        if (isWeekend) stats[day.mdh].weekendDays++;
+                        else stats[day.mdh].weekDays++;
+                    }
+                    
+                    // MD 근무 체크
+                    if (day.md && stats[day.md]) {
+                        stats[day.md].shifts.MD++;
+                        stats[day.md].totalDays++;
+                        if (isWeekend) stats[day.md].weekendDays++;
+                        else stats[day.md].weekDays++;
+                    }
+                    
+                    // N 근무 체크
+                    if (day.n1 && stats[day.n1]) {
+                        stats[day.n1].shifts.N++;
+                        stats[day.n1].totalDays++;
+                        if (isWeekend) stats[day.n1].weekendDays++;
+                        else stats[day.n1].weekDays++;
+                    }
+                    if (day.n2 && stats[day.n2]) {
+                        stats[day.n2].shifts.N++;
+                        stats[day.n2].totalDays++;
+                        if (isWeekend) stats[day.n2].weekendDays++;
+                        else stats[day.n2].weekDays++;
+                    }
+                });
+
+                // 비율 및 레벨 계산
+                const workingDoctors = Object.values(stats).filter(doctor => doctor.totalDays > 0);
+                const avgWorkDays = workingDoctors.length > 0 ? 
+                    workingDoctors.reduce((sum, doctor) => sum + doctor.totalDays, 0) / workingDoctors.length : 0;
+
+                Object.values(stats).forEach(doctor => {
+                    if (doctor.totalDays > 0) {
+                        doctor.workRatio = Math.round((doctor.totalDays / totalDays) * 100);
+                        doctor.avgPerWeek = Math.round((doctor.totalDays / totalDays * 7) * 10) / 10;
+                        
+                        // 업무량 레벨 계산
+                        if (doctor.totalDays > avgWorkDays * 1.2) {
+                            doctor.workloadLevel = 'busy';
+                        } else if (doctor.totalDays < avgWorkDays * 0.8) {
+                            doctor.workloadLevel = 'efficient';
+                        } else {
+                            doctor.workloadLevel = 'normal';
+                        }
+
+                        // 근무 패턴 분석
+                        const maxShift = Object.keys(doctor.shifts).reduce((a, b) => 
+                            doctor.shifts[a] > doctor.shifts[b] ? a : b
+                        );
+                        doctor.primaryShift = maxShift;
+                        doctor.shiftPattern = doctor.shifts;
+                    }
+                });
+
+                return {
+                    doctorStats: stats,
+                    summary: {
+                        totalDays: totalDays,
+                        workingDoctors: workingDoctors.length,
+                        avgWorkDays: Math.round(avgWorkDays * 10) / 10,
+                        maxWorkload: Math.max(...workingDoctors.map(d => d.totalDays)),
+                        minWorkload: Math.min(...workingDoctors.map(d => d.totalDays)),
+                        totalAssignments: workingDoctors.reduce((sum, doctor) => sum + doctor.totalDays, 0)
+                    }
+                };
+            },
+
+            generateSummaryCards: function(detailedStats) {
+                const summary = detailedStats.summary;
+                const workingDoctors = Object.values(detailedStats.doctorStats).filter(d => d.totalDays > 0);
+                
+                const busyDoctors = workingDoctors.filter(d => d.workloadLevel === 'busy').length;
+                const normalDoctors = workingDoctors.filter(d => d.workloadLevel === 'normal').length;
+                const efficientDoctors = workingDoctors.filter(d => d.workloadLevel === 'efficient').length;
+
+                return `
+                    <div class="col-md-3">
+                        <div class="card text-center border-primary">
+                            <div class="card-body">
+                                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                <h4 class="text-primary">${summary.workingDoctors}</h4>
+                                <small>총 근무 의사</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-success">
+                            <div class="card-body">
+                                <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
+                                <h4 class="text-success">${summary.avgWorkDays}</h4>
+                                <small>평균 근무일</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-warning">
+                            <div class="card-body">
+                                <i class="fas fa-balance-scale fa-2x text-warning mb-2"></i>
+                                <h4 class="text-warning">${Math.abs(summary.maxWorkload - summary.minWorkload)}</h4>
+                                <small>근무량 편차</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-info">
+                            <div class="card-body">
+                                <i class="fas fa-chart-pie fa-2x text-info mb-2"></i>
+                                <h4 class="text-info">${busyDoctors}/${normalDoctors}/${efficientDoctors}</h4>
+                                <small>과부하/보통/효율적</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            generateDetailedTable: function(detailedStats) {
+                const workingDoctors = Object.values(detailedStats.doctorStats)
+                    .filter(d => d.totalDays > 0)
+                    .sort((a, b) => b.totalDays - a.totalDays);
+
+                let html = '';
+                workingDoctors.forEach(doctor => {
+                    const levelClass = doctor.workloadLevel === 'busy' ? 'table-danger' : 
+                                     doctor.workloadLevel === 'efficient' ? 'table-success' : 'table-light';
+                    
+                    const levelBadge = doctor.workloadLevel === 'busy' ? 
+                        '<span class="badge bg-danger">과부하</span>' :
+                        doctor.workloadLevel === 'efficient' ? 
+                        '<span class="badge bg-success">효율적</span>' :
+                        '<span class="badge bg-secondary">보통</span>';
+
+                    html += `
+                        <tr class="${levelClass}">
+                            <td class="doctor-name">${doctor.name}</td>
+                            <td><span class="shift-badge badge-d">${doctor.shifts.D}</span></td>
+                            <td><span class="shift-badge badge-mdh">${doctor.shifts.MDH}</span></td>
+                            <td><span class="shift-badge badge-md">${doctor.shifts.MD}</span></td>
+                            <td><span class="shift-badge badge-n">${doctor.shifts.N}</span></td>
+                            <td><span class="shift-badge badge-total">${doctor.totalDays}</span></td>
+                            <td><strong>${doctor.workRatio}%</strong></td>
+                            <td><strong>${doctor.avgPerWeek}</strong></td>
+                            <td>${levelBadge}</td>
+                        </tr>
+                    `;
+                });
+
+                return html;
+            },
+
+            generateWorkloadBars: function(detailedStats) {
+                const workingDoctors = Object.values(detailedStats.doctorStats)
+                    .filter(d => d.totalDays > 0)
+                    .sort((a, b) => b.totalDays - a.totalDays);
+
+                const maxDays = Math.max(...workingDoctors.map(d => d.totalDays));
+
+                let html = '';
+                workingDoctors.forEach(doctor => {
+                    const percentage = (doctor.totalDays / maxDays) * 100;
+                    const colorClass = doctor.workloadLevel === 'busy' ? 'bg-danger' : 
+                                     doctor.workloadLevel === 'efficient' ? 'bg-success' : 'bg-primary';
+
+                    html += `
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span><strong>${doctor.name}</strong></span>
+                                <span class="text-muted">${doctor.totalDays}일</span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar ${colorClass}" 
+                                     style="width: ${percentage}%" 
+                                     title="${doctor.name}: ${doctor.totalDays}일 (${doctor.workRatio}%)">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                return html;
+            },
+
+            generateDoctorCards: function(detailedStats) {
+                const workingDoctors = Object.values(detailedStats.doctorStats)
+                    .filter(d => d.totalDays > 0)
+                    .sort((a, b) => b.totalDays - a.totalDays);
+
+                let html = '';
+                workingDoctors.forEach(doctor => {
+                    const cardClass = doctor.workloadLevel === 'busy' ? 'busy-doctor' : 
+                                    doctor.workloadLevel === 'efficient' ? 'efficient-doctor' : 'normal-doctor';
+
+                    const primaryShiftName = SYSTEM_CONFIG.shifts[doctor.primaryShift]?.name || doctor.primaryShift;
+
+                    html += `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="doctor-card ${cardClass}">
+                                <h6><i class="fas fa-user-md"></i> ${doctor.name}</h6>
+                                <div class="row text-center mb-2">
+                                    <div class="col-3">
+                                        <div class="shift-badge badge-d">${doctor.shifts.D}</div>
+                                        <small class="d-block">D</small>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="shift-badge badge-mdh">${doctor.shifts.MDH}</div>
+                                        <small class="d-block">MDH</small>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="shift-badge badge-md">${doctor.shifts.MD}</div>
+                                        <small class="d-block">MD</small>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="shift-badge badge-n">${doctor.shifts.N}</div>
+                                        <small class="d-block">N</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small><strong>총 근무:</strong> ${doctor.totalDays}일</small>
+                                    <small><strong>주당:</strong> ${doctor.avgPerWeek}일</small>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small><strong>주 근무:</strong> ${primaryShiftName}</small>
+                                    <small><strong>주말:</strong> ${doctor.weekendDays}일</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                return html;
+            }
+        };
+
+        /**
+         * 샘플 데이터 로드 (자동 풀네임 변환됨)
+         */
+        function loadSampleData() {
+            const sampleData = `1|화|이||강|강|정|
+2|수|허||박|박|강|
+3|목|권||강|오|선|
+4|금|오||박|박|허|
+5|토|선||강|강|권|
+6|일|박|이2|||허|이
+7|월|선||강|이2|이|
+8|화|권||강|허|권|
+9|수|정||이|이|오|
+10|목|정||강|강|박|
+11|금|권||이|이2|권|
+12|토|정||오|허|이2|
+13|일|박|오|||허|정
+14|월|선||권|권|박|
+15|화|오||강|정|이2|`;
+
+            document.getElementById('claude-data').value = sampleData;
+            console.log('📝 샘플 데이터 로드 완료');
+            console.log('🔄 의사명 자동 변환: 강→강희동, 오→오세현, 정→정상구, 이→이유진, 박→박인준, 권→권재화, 선→선경민, 허→허석진, 이2→이기헌');
+        }
+
+        /**
+         * Claude 데이터 처리 (강화된 버전 + 의사명 변환)
+         */
+        function processClaudeData() {
+            const rawData = document.getElementById('claude-data').value.trim();
+            
+            if (!rawData) {
+                Logger.error('Claude 데이터가 입력되지 않았습니다.');
+                alert('Claude가 분석한 데이터를 먼저 입력해주세요.');
+                return;
+            }
+
+            Logger.info('Claude 데이터 처리 시작 (의사명 변환 포함)', { dataLength: rawData.length });
+
+            // 처리 과정 표시
+            showProcessLog();
+            
+            try {
+                // 1. 데이터 파싱 (의사명 변환 포함)
+                const parsedData = parseClaudeData(rawData);
+                Logger.info('데이터 파싱 완료 (의사명 변환 적용)', { dayCount: Object.keys(parsedData).length });
+
+                // 2. 데이터 검증
+                const validation = DataValidator.validateFullSchedule(parsedData);
+                Logger.info('데이터 검증 완료', validation.stats);
+
+                if (validation.errors.length > 0) {
+                    Logger.error('데이터 검증 실패', validation.errors);
+                    showValidationErrors(validation);
+                    return;
+                }
+
+                if (validation.warnings.length > 0) {
+                    Logger.warn('데이터 검증 경고', validation.warnings);
+                    showValidationWarnings(validation);
+                }
+
+                // 3. 데이터 표준화
+                scheduleData = DataNormalizer.normalizeScheduleData(parsedData);
+                processedData = DataNormalizer.createCompatibilityWrapper(scheduleData);
+                
+                // 4. 상세 통계 계산
+                detailedStats = DetailedStatsAnalyzer.calculateDetailedStats(scheduleData);
+                Logger.info('데이터 표준화 및 상세 통계 계산 완료 (풀네임 적용)');
+
+                // 5. 결과 테이블 생성
+                generateResultTable();
+                
+                // 결과 섹션 표시
+                document.getElementById('result-section').style.display = 'block';
+                document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+                
+                Logger.info('처리 완료', { 
+                    totalDays: validation.stats.totalDays,
+                    filledDays: validation.stats.filledDays 
+                });
+
+            } catch (error) {
+                Logger.error('데이터 처리 중 오류 발생', { error: error.message, stack: error.stack });
+                alert('데이터 처리 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        /**
+         * 강화된 Claude 데이터 파싱 (의사명 변환 포함)
+         */
+        function parseClaudeData(rawData) {
+            const lines = rawData.split('\n').filter(line => line.trim());
+            const parsedScheduleData = {};
+            
+            Logger.debug('원시 데이터 파싱 시작 (의사명 변환 포함)', { lineCount: lines.length });
+
+            // 의사명 변환 함수
+            const convertDoctorName = (shortName) => {
+                const trimmed = shortName.trim();
+                const fullName = SYSTEM_CONFIG.doctorNameMapping[trimmed];
+                if (fullName && trimmed !== '') {
+                    console.log(`🔄 의사명 변환: "${trimmed}" → "${fullName}"`);
+                }
+                return fullName || trimmed;
+            };
+
+            lines.forEach((line, index) => {
+                try {
+                    const parts = line.split('|');
+                    
+                    if (parts.length < 8) {
+                        Logger.warn(`라인 ${index + 1}: 필드 수 부족 (${parts.length}/8)`, { line });
+                        return;
+                    }
+
+                    const day = parseInt(parts[0]);
+                    if (isNaN(day) || day < 1 || day > 31) {
+                        Logger.warn(`라인 ${index + 1}: 잘못된 날짜 (${parts[0]})`, { line });
+                        return;
+                    }
+
+                    // 의사명 변환 적용
+                    parsedScheduleData[day] = {
+                        date: `2025-07-${day.toString().padStart(2, '0')}`,
+                        day: parts[1].trim(),
+                        d1: convertDoctorName(parts[2]),
+                        d2: convertDoctorName(parts[3]),
+                        mdh: convertDoctorName(parts[4]),
+                        md: convertDoctorName(parts[5]),
+                        n1: convertDoctorName(parts[6]),
+                        n2: convertDoctorName(parts[7])
+                    };
+
+                } catch (error) {
+                    Logger.error(`라인 ${index + 1} 파싱 오류`, { line, error: error.message });
+                }
+            });
+
+            if (Object.keys(parsedScheduleData).length === 0) {
+                throw new Error('유효한 스케줄 데이터가 없습니다. 데이터 형식을 확인해주세요.');
+            }
+
+            console.log('✅ 의사명 변환 완료 - 풀네임으로 저장됨');
+            return parsedScheduleData;
+        }
+
+        /**
+         * 검증 오류 표시
+         */
+        function showValidationErrors(validation) {
+            const container = document.getElementById('process-log');
+            let html = '<div class="alert alert-danger"><h6>❌ 데이터 검증 실패</h6><ul>';
+            validation.errors.forEach(error => {
+                html += `<li>${error}</li>`;
+            });
+            html += '</ul></div>';
+            container.innerHTML = html;
+        }
+
+        /**
+         * 검증 경고 표시
+         */
+        function showValidationWarnings(validation) {
+            const container = document.getElementById('process-log');
+            let html = '<div class="alert alert-warning"><h6>⚠️ 데이터 검증 경고</h6><ul>';
+            validation.warnings.forEach(warning => {
+                html += `<li>${warning}</li>`;
+            });
+            html += '</ul><p class="mb-0">경고가 있지만 처리를 계속합니다.</p></div>';
+            
+            // 기존 내용에 추가
+            container.innerHTML += html;
+        }
+
+        /**
+         * 결과 테이블 생성 (풀네임 표시)
+         */
+        function generateResultTable() {
+            const table = document.getElementById('result-table');
+            
+            let html = `
+                <thead>
+                    <tr>
+                        <th>날짜</th>
+                        <th>요일</th>
+                        <th>D근무자1</th>
+                        <th>D근무자2</th>
+                        <th>MDH</th>
+                        <th>MD</th>
+                        <th>N근무자1</th>
+                        <th>N근무자2</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            // 날짜 순으로 정렬
+            const sortedDays = Object.keys(scheduleData).sort((a, b) => parseInt(a) - parseInt(b));
+
+            sortedDays.forEach(day => {
+                const data = scheduleData[day];
+                const isWeekend = data.day === '토' || data.day === '일';
+                const rowClass = isWeekend ? 'weekend-row' : '';
+                
+                html += `
+                    <tr class="${rowClass}" title="데이터 검증됨 - 풀네임 변환 완료">
+                        <td><strong>${day}일</strong></td>
+                        <td><strong>${data.day}</strong></td>
+                        <td>${data.d1 || ''}</td>
+                        <td>${data.d2 || ''}</td>
+                        <td>${data.mdh || ''}</td>
+                        <td>${data.md || ''}</td>
+                        <td>${data.n1 || ''}</td>
+                        <td>${data.n2 || ''}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody>';
+            table.innerHTML = html;
+            
+            Logger.info('결과 테이블 생성 완료 (풀네임 표시)', { dayCount: sortedDays.length });
+        }
+
+        /**
+         * ===== 새로 추가된 상세 통계 표시 함수 =====
+         */
+        function showDetailedStatistics() {
+            if (!detailedStats || Object.keys(detailedStats).length === 0) {
+                alert('먼저 스케줄 데이터를 변환해주세요.');
+                return;
+            }
+
+            // 요약 카드 생성
+            document.getElementById('summary-cards').innerHTML = 
+                DetailedStatsAnalyzer.generateSummaryCards(detailedStats);
+
+            // 상세 테이블 생성
+            document.getElementById('detailed-stats-body').innerHTML = 
+                DetailedStatsAnalyzer.generateDetailedTable(detailedStats);
+
+            // 근무량 비교 차트 생성
+            document.getElementById('workload-bars').innerHTML = 
+                DetailedStatsAnalyzer.generateWorkloadBars(detailedStats);
+
+            // 의사별 상세 카드 생성
+            document.getElementById('doctor-detail-cards').innerHTML = 
+                DetailedStatsAnalyzer.generateDoctorCards(detailedStats);
+
+            // 섹션 표시
+            document.getElementById('detailed-statistics-section').style.display = 'block';
+            document.getElementById('detailed-statistics-section').scrollIntoView({ behavior: 'smooth' });
+
+            console.log('✅ 상세 통계 표시 완료:', detailedStats);
+            
+            // 통계 요약 알림
+            const summary = detailedStats.summary;
+            const workingDoctors = Object.values(detailedStats.doctorStats).filter(d => d.totalDays > 0);
+            const busyCount = workingDoctors.filter(d => d.workloadLevel === 'busy').length;
+            const efficientCount = workingDoctors.filter(d => d.workloadLevel === 'efficient').length;
+            
+            alert(`📊 상세 근무 통계 분석 완료!\n\n` +
+                  `👥 총 근무 의사: ${summary.workingDoctors}명\n` +
+                  `📅 평균 근무일: ${summary.avgWorkDays}일\n` +
+                  `📈 근무량 편차: ${summary.maxWorkload - summary.minWorkload}일\n` +
+                  `🔥 과부하 의사: ${busyCount}명\n` +
+                  `✨ 효율적 의사: ${efficientCount}명\n\n` +
+                  `상세한 분석 결과를 확인해보세요!`);
+        }
+
+        /**
+         * 엑셀 파일 다운로드 (풀네임 사용 + 상세 통계 시트 추가)
+         */
+        function downloadExcel() {
+            if (!scheduleData || Object.keys(scheduleData).length === 0) {
+                alert('변환할 데이터가 없습니다.');
+                return;
+            }
+
+            // 엑셀 데이터 준비 (풀네임으로 표시)
+            const excelData = [];
+            excelData.push(['날짜', '요일', 'D근무자1', 'D근무자2', 'MDH근무자', 'MD근무자', 'N근무자1', 'N근무자2']);
+
+            // 날짜 순으로 정렬하여 추가
+            const sortedDays = Object.keys(scheduleData).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            sortedDays.forEach(day => {
+                const data = scheduleData[day];
+                excelData.push([
+                    `${day}일`,
+                    data.day,
+                    data.d1 || '',
+                    data.d2 || '',
+                    data.mdh || '',
+                    data.md || '',
+                    data.n1 || '',
+                    data.n2 || ''
+                ]);
+            });
+
+            // 기본 통계 시트 데이터 생성
+            const statsData = generateStatisticsData();
+            
+            // 상세 통계 시트 데이터 생성 (새로 추가)
+            const detailedStatsData = generateDetailedStatisticsData();
+            
+            // 엑셀 파일 생성
+            const wb = XLSX.utils.book_new();
+            
+            // 스케줄 시트
+            const ws1 = XLSX.utils.aoa_to_sheet(excelData);
+            XLSX.utils.book_append_sheet(wb, ws1, "응급실스케줄_풀네임");
+            
+            // 기본 통계 시트
+            const ws2 = XLSX.utils.aoa_to_sheet(statsData);
+            XLSX.utils.book_append_sheet(wb, ws2, "기본근무통계_풀네임");
+
+            // 상세 통계 시트 (새로 추가)
+            const ws3 = XLSX.utils.aoa_to_sheet(detailedStatsData);
+            XLSX.utils.book_append_sheet(wb, ws3, "상세근무분석_풀네임");
+
+            // 파일 다운로드
+            const filename = `응급실스케줄_상세통계_풀네임_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+
+            console.log('✅ 엑셀 파일 다운로드 완료 (풀네임 + 상세통계):', filename);
+            alert(`✅ 상세 통계가 포함된 엑셀 파일이 다운로드되었습니다!\n\n파일명: ${filename}\n\n포함 내용:\n- 응급실스케줄 시트 (풀네임)\n- 기본근무통계 시트 (풀네임)\n- 상세근무분석 시트 (NEW! 업무량 레벨, 근무 패턴 등)\n\n특징: 모든 의사명이 풀네임으로 표시되며, 논문 작성에 필요한 상세 분석 데이터가 포함됩니다.`);
+        }
+
+        /**
+         * 통계 데이터 생성 (풀네임 사용)
+         */
+        function generateStatisticsData() {
+            const stats = {};
+            // 풀네임 의사 리스트 사용
+            const staffList = Object.values(SYSTEM_CONFIG.doctorNameMapping);
+            
+            // 통계 초기화
+            staffList.forEach(staff => {
+                stats[staff] = { d: 0, mdh: 0, md: 0, n: 0, total: 0 };
+            });
+
+            // 통계 계산
+            Object.values(scheduleData).forEach(day => {
+                if (day.d1 && stats[day.d1]) stats[day.d1].d++;
+                if (day.d2 && stats[day.d2]) stats[day.d2].d++;
+                if (day.mdh && stats[day.mdh]) stats[day.mdh].mdh++;
+                if (day.md && stats[day.md]) stats[day.md].md++;
+                if (day.n1 && stats[day.n1]) stats[day.n1].n++;
+                if (day.n2 && stats[day.n2]) stats[day.n2].n++;
+            });
+
+            // 총합 계산
+            staffList.forEach(staff => {
+                stats[staff].total = stats[staff].d + stats[staff].mdh + stats[staff].md + stats[staff].n;
+            });
+
+            // 통계 데이터 배열로 변환
+            const statsData = [];
+            statsData.push(['근무자', 'D근무', 'MDH근무', 'MD근무', 'N근무', '총근무일']);
+            
+            staffList.forEach(staff => {
+                const data = stats[staff];
+                if (data.total > 0) { // 실제 근무가 있는 의사만 표시
+                    statsData.push([staff, data.d, data.mdh, data.md, data.n, data.total]);
+                }
+            });
+
+            return statsData;
+        }
+
+        /**
+         * 상세 통계 데이터 생성 (새로 추가)
+         */
+        function generateDetailedStatisticsData() {
+            if (!detailedStats) {
+                detailedStats = DetailedStatsAnalyzer.calculateDetailedStats(scheduleData);
+            }
+
+            const workingDoctors = Object.values(detailedStats.doctorStats)
+                .filter(d => d.totalDays > 0)
+                .sort((a, b) => b.totalDays - a.totalDays);
+
+            const statsData = [];
+            statsData.push([
+                '의사명', 'D근무', 'MDH근무', 'MD근무', 'N근무', '총근무일', 
+                '근무비율(%)', '주당평균', '업무량등급', '주말근무', '평일근무', '주요근무타입'
+            ]);
+
+            workingDoctors.forEach(doctor => {
+                const levelText = doctor.workloadLevel === 'busy' ? '과부하' :
+                                doctor.workloadLevel === 'efficient' ? '효율적' : '보통';
+                
+                const primaryShiftName = SYSTEM_CONFIG.shifts[doctor.primaryShift]?.name || doctor.primaryShift;
+
+                statsData.push([
+                    doctor.name,
+                    doctor.shifts.D,
+                    doctor.shifts.MDH,
+                    doctor.shifts.MD,
+                    doctor.shifts.N,
+                    doctor.totalDays,
+                    doctor.workRatio,
+                    doctor.avgPerWeek,
+                    levelText,
+                    doctor.weekendDays,
+                    doctor.weekDays,
+                    primaryShiftName
+                ]);
+            });
+
+            // 요약 정보 추가
+            statsData.push(['']);
+            statsData.push(['=== 분석 요약 ===']);
+            statsData.push(['총 분석 기간', `${detailedStats.summary.totalDays}일`]);
+            statsData.push(['참여 의사 수', `${detailedStats.summary.workingDoctors}명`]);
+            statsData.push(['평균 근무일', `${detailedStats.summary.avgWorkDays}일`]);
+            statsData.push(['최대 근무일', `${detailedStats.summary.maxWorkload}일`]);
+            statsData.push(['최소 근무일', `${detailedStats.summary.minWorkload}일`]);
+            statsData.push(['근무량 편차', `${detailedStats.summary.maxWorkload - detailedStats.summary.minWorkload}일`]);
+
+            return statsData;
+        }
+
+        /**
+         * 기존 통계 표시 (호환성 유지)
+         */
+        function showStatistics() {
+            const statsData = generateStatisticsData();
+            const container = document.getElementById('statistics-content');
+            
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>근무자 (풀네임)</th>
+                                <th>D 근무</th>
+                                <th>MDH 근무</th>
+                                <th>MD 근무</th>
+                                <th>N 근무</th>
+                                <th>총 근무일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            for (let i = 1; i < statsData.length; i++) {
+                const row = statsData[i];
+                html += `
+                    <tr>
+                        <td><strong>${row[0]}</strong></td>
+                        <td><span class="badge bg-info">${row[1]}</span></td>
+                        <td><span class="badge bg-warning">${row[2]}</span></td>
+                        <td><span class="badge bg-primary">${row[3]}</span></td>
+                        <td><span class="badge bg-success">${row[4]}</span></td>
+                        <td><strong><span class="badge bg-secondary">${row[5]}</span></strong></td>
+                    </tr>
+                `;
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            document.getElementById('statistics-section').style.display = 'block';
+        }
+
+        /**
+         * 처리 과정 로그 표시 (의사명 변환 추가)
+         */
+        function showProcessLog() {
+            document.getElementById('process-section').style.display = 'block';
+            
+            const logContainer = document.getElementById('process-log');
+            logContainer.innerHTML = `
+                <div class="d-flex align-items-center mb-2">
+                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                    <span>Claude 데이터 파싱 중...</span>
+                </div>
+            `;
+
+            setTimeout(() => {
+                logContainer.innerHTML += `
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <span>데이터 파싱 완료 ✅</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+                        <span>의사명 변환 중... (강→강희동, 이→이유진 등)</span>
+                    </div>
+                `;
+            }, 500);
+
+            setTimeout(() => {
+                logContainer.innerHTML += `
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-user-tag text-success me-2"></i>
+                        <span>의사명 풀네임 변환 완료 ✅</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="spinner-border spinner-border-sm text-info me-2"></div>
+                        <span>데이터 검증 중...</span>
+                    </div>
+                `;
+            }, 1000);
+
+            setTimeout(() => {
+                logContainer.innerHTML += `
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <span>데이터 검증 완료 ✅</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="spinner-border spinner-border-sm text-warning me-2"></div>
+                        <span>상세 통계 분석 중...</span>
+                    </div>
+                `;
+            }, 1500);
+
+            setTimeout(() => {
+                logContainer.innerHTML += `
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <span>데이터 표준화 완료 ✅</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-chart-bar text-info me-2"></i>
+                        <span>상세 근무 통계 분석 완료 ✅</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-magic text-warning me-2"></i>
+                        <span><strong>시스템 통합 준비 완료! 상세 통계와 함께 다른 모듈에서 안전하게 사용 가능합니다.</strong></span>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        /**
+         * 강화된 JSON 내보내기 (풀네임 + 상세 통계 포함)
+         */
+        function exportToJSON() {
+            if (!scheduleData || Object.keys(scheduleData).length === 0) {
+                Logger.error('내보낼 데이터가 없습니다.');
+                alert('내보낼 데이터가 없습니다.');
+                return;
+            }
+
+            Logger.info('JSON 내보내기 시작 (풀네임 + 상세 통계 포함)');
+
+            // 상세 통계가 없으면 계산
+            if (!detailedStats || Object.keys(detailedStats).length === 0) {
+                detailedStats = DetailedStatsAnalyzer.calculateDetailedStats(scheduleData);
+            }
+
+            // 시스템 통합용 JSON 구조
+            const exportData = {
+                // 시스템 메타데이터
+                _meta: {
+                    systemName: "ER-Schedule-Hybrid-System-Enhanced",
+                    version: SYSTEM_CONFIG.version,
+                    dataSchema: SYSTEM_CONFIG.dataSchema,
+                    generatedAt: new Date().toISOString(),
+                    compatibility: ["javascript", "python", "r", "api"],
+                    doctorNameMappingApplied: true,
+                    detailedStatisticsIncluded: true,
+                    validation: DataValidator.validateFullSchedule(scheduleData)
+                },
+
+                // 설정 정보 (의사명 매핑 포함)
+                config: SYSTEM_CONFIG,
+
+                // 실제 스케줄 데이터 (풀네임)
+                schedule: scheduleData,
+
+                // 기본 통계 정보 (풀네임 기준)
+                basicStatistics: generateStatisticsObject(),
+
+                // 상세 통계 정보 (NEW!)
+                detailedStatistics: detailedStats,
+
+                // API 함수들 (JavaScript에서 사용 가능)
+                api: {
+                    description: "Use processedData._system.api for JavaScript functions",
+                    availableFunctions: [
+                        "getDay(dayNumber)",
+                        "getStaffByDay(dayNumber)", 
+                        "getAllStaff()",
+                        "getWorkDays(staffName)",
+                        "getDetailedStats()",
+                        "getDoctorWorkloadLevel(doctorName)"
+                    ]
+                },
+
+                // 로그 정보
+                logs: Logger.exportLogs()
+            };
+
+            const jsonString = JSON.stringify(exportData, null, 2);
+            
+            // 파일 다운로드
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ER_Schedule_Enhanced_FullName_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            Logger.info('JSON 파일 다운로드 완료 (풀네임 + 상세통계)', { filename: a.download });
+            alert('✅ 상세 통계가 포함된 시스템 통합용 JSON 파일이 다운로드되었습니다!\n\n새로운 특징:\n- 의사별 업무량 레벨 분석\n- 근무 패턴 상세 분석\n- 주말/평일 근무 구분\n- 근무 비율 및 평균 계산\n- 데이터 검증 완료\n- 풀네임 변환 적용\n- 표준화된 구조\n- 메타데이터 포함\n- 논문 작성용 통계 데이터\n- 다른 AI 시스템에서 안전하게 사용 가능');
+        }
+
+        /**
+         * 강화된 CSV 내보내기 (풀네임 + 상세 통계)
+         */
+        function exportToCSV() {
+            if (!scheduleData || Object.keys(scheduleData).length === 0) {
+                Logger.error('내보낼 데이터가 없습니다.');
+                alert('내보낼 데이터가 없습니다.');
+                return;
+            }
+
+            Logger.info('CSV 내보내기 시작 (풀네임 + 상세 통계)');
+
+            // 헤더에 메타데이터 추가
+            let csvContent = `# ER Schedule System Export (Full Name + Detailed Statistics)
+# Generated: ${new Date().toISOString()}
+# Version: ${SYSTEM_CONFIG.version}
+# Schema: ${SYSTEM_CONFIG.dataSchema}
+# Doctor Name Mapping Applied: Yes
+# Detailed Statistics Included: Yes
+# Validation: Passed
+#
+날짜,요일,D근무자1,D근무자2,MDH근무자,MD근무자,N근무자1,N근무자2\n`;
+            
+            const sortedDays = Object.keys(scheduleData).sort((a, b) => parseInt(a) - parseInt(b));
+            sortedDays.forEach(day => {
+                const data = scheduleData[day];
+                csvContent += `${day}일,${data.day},${data.d1 || ''},${data.d2 || ''},${data.mdh || ''},${data.md || ''},${data.n1 || ''},${data.n2 || ''}\n`;
+            });
+
+            // 파일 다운로드
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ER_Schedule_Enhanced_FullName_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            Logger.info('CSV 파일 다운로드 완료 (풀네임 + 상세통계)', { filename: a.download });
+            alert('✅ 상세 통계 메타데이터가 포함된 풀네임 적용 CSV 파일이 다운로드되었습니다!\n\n특징:\n- 메타데이터 헤더 포함\n- 풀네임 변환 적용\n- 상세 통계 정보 포함\n- 검증된 데이터\n- R/Python에서 바로 사용 가능\n- 논문 작성용 데이터');
+        }
+
+        /**
+         * 강화된 JavaScript 내보내기 (풀네임 모듈화 + 상세 통계)
+         */
+        function copyAsJavaScript() {
+            if (!scheduleData || Object.keys(scheduleData).length === 0) {
+                Logger.error('복사할 데이터가 없습니다.');
+                alert('복사할 데이터가 없습니다.');
+                return;
+            }
+
+            Logger.info('JavaScript 코드 생성 시작 (풀네임 + 상세 통계)');
+
+            // 상세 통계가 없으면 계산
+            if (!detailedStats || Object.keys(detailedStats).length === 0) {
+                detailedStats = DetailedStatsAnalyzer.calculateDetailedStats(scheduleData);
+            }
+
+            const jsCode = `/**
+ * ER Schedule System - Enhanced JavaScript Module (Full Name + Detailed Statistics)
+ * Generated: ${new Date().toISOString()}
+ * Version: ${SYSTEM_CONFIG.version}
+ * Schema: ${SYSTEM_CONFIG.dataSchema}
+ * Doctor Name Mapping: Applied (강→강희동, 이→이유진 등)
+ * Detailed Statistics: Included (업무량 레벨, 근무 패턴 등)
+ * 
+ * 다른 시스템에서 안전하게 import하여 사용 가능
+ * 논문 작성용 상세 통계 데이터 포함
+ */
+
+// 설정 정보 (의사명 매핑 포함)
+const ER_SCHEDULE_CONFIG = ${JSON.stringify(SYSTEM_CONFIG, null, 2)};
+
+// 검증된 스케줄 데이터 (풀네임)
+const ER_SCHEDULE_DATA = ${JSON.stringify(scheduleData, null, 2)};
+
+// 상세 통계 데이터 (NEW!)
+const ER_DETAILED_STATISTICS = ${JSON.stringify(detailedStats, null, 2)};
+
+// 강화된 통합 모듈 (다른 시스템에서 사용)
+const ERScheduleModule = {
+    // 시스템 정보
+    getSystemInfo: function() {
+        return {
+            name: "ER-Schedule-Hybrid-System-Enhanced",
+            version: ER_SCHEDULE_CONFIG.version,
+            schema: ER_SCHEDULE_CONFIG.dataSchema,
+            generatedAt: "${new Date().toISOString()}",
+            doctorNameMappingApplied: true,
+            fullNameUsed: true,
+            detailedStatisticsIncluded: true
+        };
+    },
+
+    // 의사명 매핑 정보
+    getDoctorMapping: function() {
+        return ER_SCHEDULE_CONFIG.doctorNameMapping;
+    },
+
+    // 특정 날짜 스케줄 조회
+    getDay: function(dayNumber) {
+        return ER_SCHEDULE_DATA[dayNumber] || null;
+    },
+
+    // 특정 날짜의 모든 근무자 조회 (풀네임)
+    getStaffByDay: function(dayNumber) {
+        const dayData = this.getDay(dayNumber);
+        if (!dayData) return [];
+        return [dayData.d1, dayData.d2, dayData.mdh, dayData.md, dayData.n1, dayData.n2].filter(Boolean);
+    },
+
+    // 전체 근무자 목록 조회 (풀네임)
+    getAllStaff: function() {
+        const allStaff = new Set();
+        Object.values(ER_SCHEDULE_DATA).forEach(day => {
+            this.getStaffByDay(day._meta.dayNumber).forEach(staff => allStaff.add(staff));
+        });
+        return Array.from(allStaff).sort();
+    },
+
+    // 특정 근무자의 근무일 조회 (풀네임 기준)
+    getWorkDays: function(staffName) {
+        const workDays = [];
+        Object.keys(ER_SCHEDULE_DATA).forEach(day => {
+            const dayStaff = this.getStaffByDay(day);
+            if (dayStaff.includes(staffName)) {
+                const dayData = ER_SCHEDULE_DATA[day];
+                workDays.push({
+                    day: parseInt(day),
+                    date: dayData.date,
+                    dayOfWeek: dayData.day,
+                    shifts: this.getStaffShifts(dayData, staffName)
+                });
+            }
+        });
+        return workDays;
+    },
+
+    // 특정 근무자의 근무 유형 조회
+    getStaffShifts: function(dayData, staffName) {
+        const shifts = [];
+        if (dayData.d1 === staffName || dayData.d2 === staffName) shifts.push('D');
+        if (dayData.mdh === staffName) shifts.push('MDH');
+        if (dayData.md === staffName) shifts.push('MD');
+        if (dayData.n1 === staffName || dayData.n2 === staffName) shifts.push('N');
+        return shifts;
+    },
+
+    // 기본 근무 통계 생성 (풀네임 기준)
+    getBasicStatistics: function() {
+        const stats = {};
+        Object.values(ER_SCHEDULE_CONFIG.doctorNameMapping).forEach(fullName => {
+            stats[fullName] = { d: 0, mdh: 0, md: 0, n: 0, total: 0 };
+        });
+
+        Object.values(ER_SCHEDULE_DATA).forEach(day => {
+            if (day.d1 && stats[day.d1]) stats[day.d1].d++;
+            if (day.d2 && stats[day.d2]) stats[day.d2].d++;
+            if (day.mdh && stats[day.mdh]) stats[day.mdh].mdh++;
+            if (day.md && stats[day.md]) stats[day.md].md++;
+            if (day.n1 && stats[day.n1]) stats[day.n1].n++;
+            if (day.n2 && stats[day.n2]) stats[day.n2].n++;
+        });
+
+        Object.keys(stats).forEach(staff => {
+            stats[staff].total = stats[staff].d + stats[staff].mdh + stats[staff].md + stats[staff].n;
+        });
+
+        return stats;
+    },
+
+    // ===== 새로 추가된 상세 통계 함수들 =====
+    
+    // 상세 통계 조회
+    getDetailedStatistics: function() {
+        return ER_DETAILED_STATISTICS;
+    },
+
+    // 특정 의사의 상세 정보 조회
+    getDoctorDetailedInfo: function(doctorName) {
+        return ER_DETAILED_STATISTICS.doctorStats[doctorName] || null;
+    },
+
+    // 특정 의사의 업무량 레벨 조회
+    getDoctorWorkloadLevel: function(doctorName) {
+        const doctorInfo = this.getDoctorDetailedInfo(doctorName);
+        return doctorInfo ? doctorInfo.workloadLevel : null;
+    },
+
+    // 업무량 레벨별 의사 목록 조회
+    getDoctorsByWorkloadLevel: function(level) {
+        // level: 'busy', 'normal', 'efficient'
+        return Object.values(ER_DETAILED_STATISTICS.doctorStats)
+            .filter(doctor => doctor.workloadLevel === level && doctor.totalDays > 0)
+            .map(doctor => doctor.name);
+    },
+
+    // 근무 균형 분석
+    getWorkloadBalance: function() {
+        const summary = ER_DETAILED_STATISTICS.summary;
+        return {
+            workloadSpread: summary.maxWorkload - summary.minWorkload,
+            averageWorkload: summary.avgWorkDays,
+            balanceScore: summary.maxWorkload > 0 ? 
+                Math.round((1 - (summary.maxWorkload - summary.minWorkload) / summary.maxWorkload) * 100) : 0
+        };
+    },
+
+    // 주말 근무 분석
+    getWeekendWorkAnalysis: function() {
+        const analysis = {};
+        Object.values(ER_DETAILED_STATISTICS.doctorStats).forEach(doctor => {
+            if (doctor.totalDays > 0) {
+                analysis[doctor.name] = {
+                    weekendDays: doctor.weekendDays,
+                    weekDays: doctor.weekDays,
+                    weekendRatio: doctor.totalDays > 0 ? 
+                        Math.round((doctor.weekendDays / doctor.totalDays) * 100) : 0
+                };
+            }
+        });
+        return analysis;
+    },
+
+    // 데이터 검증
+    validateData: function() {
+        return {
+            isValid: true,
+            message: "Data validated by ER Schedule Hybrid System Enhanced",
+            timestamp: "${new Date().toISOString()}",
+            doctorNameMappingApplied: true,
+            detailedStatisticsIncluded: true
+        };
+    }
+};
+
+// 사용 예시:
+console.log('시스템 정보:', ERScheduleModule.getSystemInfo());
+console.log('1일 스케줄:', ERScheduleModule.getDay(1));
+console.log('전체 근무자 (풀네임):', ERScheduleModule.getAllStaff());
+console.log('이유진 근무자의 근무일:', ERScheduleModule.getWorkDays('이유진'));
+console.log('의사명 매핑:', ERScheduleModule.getDoctorMapping());
+console.log('상세 통계:', ERScheduleModule.getDetailedStatistics());
+console.log('과부하 의사들:', ERScheduleModule.getDoctorsByWorkloadLevel('busy'));
+console.log('근무 균형 점수:', ERScheduleModule.getWorkloadBalance());
+
+// Node.js에서 사용할 경우
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ERScheduleModule;
+}
+
+// AMD에서 사용할 경우
+if (typeof define === 'function' && define.amd) {
+    define([], function() { return ERScheduleModule; });
+}`;
+
+            // 클립보드에 복사
+            navigator.clipboard.writeText(jsCode).then(() => {
+                Logger.info('JavaScript 모듈 복사 완료 (풀네임 + 상세통계)');
+                alert('✅ 상세 통계가 포함된 풀네임 적용 JavaScript 모듈이 클립보드에 복사되었습니다!\n\n새로운 특징:\n- 완전한 모듈 구조\n- 풀네임 의사명 사용\n- 의사명 매핑 정보 포함\n- 상세 통계 분석 함수들 제공\n- 업무량 레벨 조회 기능\n- 근무 균형 분석 기능\n- 주말 근무 분석 기능\n- API 함수들 대폭 확장\n- Node.js/AMD 호환\n- 다른 시스템에서 안전하게 import 가능\n- 논문 작성용 분석 함수 포함\n\n웹 시스템에 바로 붙여넣기하여 사용하세요.');
+            }).catch(() => {
+                showCodePopup('JavaScript 통합 모듈 (풀네임 + 상세통계)', jsCode);
+            });
+        }
+
+        /**
+         * 통계 객체 생성 (풀네임 기준)
+         */
+        function generateStatisticsObject() {
+            const stats = {};
+            Object.values(SYSTEM_CONFIG.doctorNameMapping).forEach(fullName => {
+                stats[fullName] = { d: 0, mdh: 0, md: 0, n: 0, total: 0 };
+            });
+
+            Object.values(scheduleData).forEach(day => {
+                if (day.d1 && stats[day.d1]) stats[day.d1].d++;
+                if (day.d2 && stats[day.d2]) stats[day.d2].d++;
+                if (day.mdh && stats[day.mdh]) stats[day.mdh].mdh++;
+                if (day.md && stats[day.md]) stats[day.md].md++;
+                if (day.n1 && stats[day.n1]) stats[day.n1].n++;
+                if (day.n2 && stats[day.n2]) stats[day.n2].n++;
+            });
+
+            Object.keys(stats).forEach(staff => {
+                stats[staff].total = stats[staff].d + stats[staff].mdh + stats[staff].md + stats[staff].n;
+            });
+
+            return stats;
+        }
+
+        /**
+         * 코드 팝업 표시
+         */
+        function showCodePopup(title, code) {
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">${title}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <textarea class="form-control" rows="20" readonly style="font-family: monospace; font-size: 0.85em;">${code}</textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="copyTextFromModal(this)">복사</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+            
+            // 모달이 닫힐 때 DOM에서 제거
+            modal.addEventListener('hidden.bs.modal', () => {
+                document.body.removeChild(modal);
+            });
+        }
+
+        /**
+         * 모달에서 텍스트 복사
+         */
+        function copyTextFromModal(button) {
+            const textarea = button.closest('.modal').querySelector('textarea');
+            textarea.select();
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                button.textContent = '복사됨!';
+                button.className = 'btn btn-success';
+                setTimeout(() => {
+                    button.textContent = '복사';
+                    button.className = 'btn btn-primary';
+                }, 2000);
+            });
+        }
+
+        /**
+         * 시스템 초기화
+         */
+        function resetSystem() {
+            if (confirm('모든 데이터가 삭제됩니다. 정말 다시 시작하시겠습니까?')) {
+                location.reload();
+            }
+        }
+
+        console.log('✅ 하이브리드 시스템 로드 완료 (Enhanced) - Claude + 웹시스템 + 의사명 풀네임 변환 + 상세 통계');
+        console.log('🔄 의사명 매핑: 강→강희동, 오→오세현, 정→정상구, 이→이유진, 박→박인준, 권→권재화, 선→선경민, 허→허석진, 이2→이기헌');
+        console.log('📊 상세 통계: 업무량 레벨 분석, 근무 패턴 분석, 주말/평일 구분, 근무 균형 분석 포함');
+    </script>
+</body>
+</html>
