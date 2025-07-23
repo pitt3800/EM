@@ -631,16 +631,60 @@
                     <strong>MD (Mid-Day):</strong> 16:00~익일 01:00 (9시간)
                   </li>
                   <li>
-                    <strong>N (Night):</strong> 18:00~익일 08:00 또는
-                    23:00~08:00 (14시간 또는 9시간)
+                    <strong>N (Night):</strong> 18:00~익일 08:00 (14시간) 또는
+                    23:00~익일 08:00 (9시간)
+                  </li>
+                  <li>
+                    <small class="text-muted"
+                      >* D 2명, N 2명 근무시 N은 14시간, 그 외는 9시간</small
+                    >
                   </li>
                 </ul>
               </div>
 
-              <textarea
-                class="schedule-input-area w-100"
-                id="scheduleData"
-                placeholder="근무 스케줄 데이터를 입력하세요...
+              <!-- 입력 방식 선택 탭 -->
+              <ul
+                class="nav nav-pills nav-fill mb-3"
+                id="inputTypeTabs"
+                role="tablist"
+              >
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link active"
+                    id="text-input-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#text-input"
+                    type="button"
+                    role="tab"
+                  >
+                    <i class="fas fa-edit"></i> 텍스트 입력
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="excel-input-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#excel-input"
+                    type="button"
+                    role="tab"
+                  >
+                    <i class="fas fa-file-excel"></i> 엑셀 파일 입력
+                  </button>
+                </li>
+              </ul>
+
+              <div class="tab-content" id="inputTypeContent">
+                <!-- 텍스트 입력 탭 -->
+                <div
+                  class="tab-pane fade show active"
+                  id="text-input"
+                  role="tabpanel"
+                >
+                  <textarea
+                    class="schedule-input-area w-100"
+                    id="scheduleData"
+                    placeholder="근무 스케줄 데이터를 입력하세요...
 
 형식: 날짜|요일|D1|D2|MDH|MD|N1|N2
 
@@ -648,21 +692,53 @@
 1|화|이||강|강|정|
 2|수|허||박|박|강|
 3|목|권||강|오|선|"
-              ></textarea>
+                  ></textarea>
 
-              <div class="text-center mt-3">
-                <button
-                  class="btn btn-medical btn-lg"
-                  onclick="processScheduleData()"
-                >
-                  <i class="fas fa-cogs"></i> 스케줄 변환
-                </button>
-                <button
-                  class="btn btn-outline-secondary btn-lg ms-2"
-                  onclick="loadSampleSchedule()"
-                >
-                  <i class="fas fa-flask"></i> 샘플 로드
-                </button>
+                  <div class="text-center mt-3">
+                    <button
+                      class="btn btn-medical btn-lg"
+                      onclick="processScheduleData()"
+                    >
+                      <i class="fas fa-cogs"></i> 스케줄 변환
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary btn-lg ms-2"
+                      onclick="loadSampleSchedule()"
+                    >
+                      <i class="fas fa-flask"></i> 샘플 로드
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 엑셀 파일 입력 탭 -->
+                <div class="tab-pane fade" id="excel-input" role="tabpanel">
+                  <div class="file-drop-area" id="scheduleFileDropArea">
+                    <i
+                      class="fas fa-cloud-upload-alt fa-4x mb-3"
+                      style="color: var(--primary-color)"
+                    ></i>
+                    <h5>근무 스케줄 엑셀 파일 업로드</h5>
+                    <p class="text-muted mb-3">
+                      달력 형식의 엑셀 파일을 드래그하거나 클릭하여 선택하세요
+                    </p>
+                    <p class="small text-info mb-3">
+                      <i class="fas fa-info-circle"></i>
+                      달력 형식: 1~31(날짜), 각 날짜 아래 3행(D/MDH·MD/N 근무자)
+                    </p>
+                    <input
+                      type="file"
+                      id="scheduleFileInput"
+                      accept=".xlsx,.xls"
+                      style="display: none"
+                    />
+                    <button
+                      class="btn btn-primary-academic"
+                      onclick="document.getElementById('scheduleFileInput').click()"
+                    >
+                      <i class="fas fa-folder-open"></i> 엑셀 파일 선택
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -694,6 +770,12 @@
                   onclick="generateWorkloadAnalysis()"
                 >
                   <i class="fas fa-chart-bar"></i> 근무량 분석
+                </button>
+                <button
+                  class="btn btn-warning btn-lg ms-2"
+                  onclick="generateDetailedWorkScheduleTable()"
+                >
+                  <i class="fas fa-table"></i> 상세 근무표
                 </button>
               </div>
 
@@ -998,7 +1080,21 @@
           D: 10,
           MDH: 4,
           MD: 9,
-          N: 14,
+          N: 14, // 기본값, 실제로는 근무 패턴에 따라 동적 계산
+        },
+
+        // N 근무시간 계산 (D 2명, N 2명일 때 14시간, 그 외 9시간)
+        calculateNightHours: function (scheduleData, day) {
+          const dayData = scheduleData[day];
+          if (!dayData) return 9;
+
+          // D 근무자 수 계산
+          const dCount = (dayData.d1 ? 1 : 0) + (dayData.d2 ? 1 : 0);
+          // N 근무자 수 계산
+          const nCount = (dayData.n1 ? 1 : 0) + (dayData.n2 ? 1 : 0);
+
+          // D 2명, N 2명인 경우 14시간, 그 외 9시간
+          return dCount === 2 && nCount === 2 ? 14 : 9;
         },
 
         convertDoctorName: function (shortName) {
@@ -1040,24 +1136,27 @@
             workHours[staff] = 0;
           });
 
-          Object.values(scheduleData).forEach((day) => {
-            if (day.d1 && workHours[day.d1] !== undefined) {
-              workHours[day.d1] += this.shiftHours["D"];
+          Object.keys(scheduleData).forEach((day) => {
+            const dayData = scheduleData[day];
+            const nightHours = this.calculateNightHours(scheduleData, day);
+
+            if (dayData.d1 && workHours[dayData.d1] !== undefined) {
+              workHours[dayData.d1] += this.shiftHours["D"];
             }
-            if (day.d2 && workHours[day.d2] !== undefined) {
-              workHours[day.d2] += this.shiftHours["D"];
+            if (dayData.d2 && workHours[dayData.d2] !== undefined) {
+              workHours[dayData.d2] += this.shiftHours["D"];
             }
-            if (day.mdh && workHours[day.mdh] !== undefined) {
-              workHours[day.mdh] += this.shiftHours["MDH"];
+            if (dayData.mdh && workHours[dayData.mdh] !== undefined) {
+              workHours[dayData.mdh] += this.shiftHours["MDH"];
             }
-            if (day.md && workHours[day.md] !== undefined) {
-              workHours[day.md] += this.shiftHours["MD"];
+            if (dayData.md && workHours[dayData.md] !== undefined) {
+              workHours[dayData.md] += this.shiftHours["MD"];
             }
-            if (day.n1 && workHours[day.n1] !== undefined) {
-              workHours[day.n1] += this.shiftHours["N"];
+            if (dayData.n1 && workHours[dayData.n1] !== undefined) {
+              workHours[dayData.n1] += nightHours;
             }
-            if (day.n2 && workHours[day.n2] !== undefined) {
-              workHours[day.n2] += this.shiftHours["N"];
+            if (dayData.n2 && workHours[dayData.n2] !== undefined) {
+              workHours[dayData.n2] += nightHours;
             }
           });
 
@@ -1069,16 +1168,44 @@
           const staffList = Object.values(this.doctorNameMapping);
 
           staffList.forEach((staff) => {
-            stats[staff] = { d: 0, mdh: 0, md: 0, n: 0, total: 0 };
+            stats[staff] = {
+              d: 0,
+              mdh: 0,
+              md: 0,
+              n: 0,
+              total: 0,
+              totalHours: 0,
+            };
           });
 
-          Object.values(scheduleData).forEach((day) => {
-            if (day.d1 && stats[day.d1]) stats[day.d1].d++;
-            if (day.d2 && stats[day.d2]) stats[day.d2].d++;
-            if (day.mdh && stats[day.mdh]) stats[day.mdh].mdh++;
-            if (day.md && stats[day.md]) stats[day.md].md++;
-            if (day.n1 && stats[day.n1]) stats[day.n1].n++;
-            if (day.n2 && stats[day.n2]) stats[day.n2].n++;
+          Object.keys(scheduleData).forEach((day) => {
+            const dayData = scheduleData[day];
+            const nightHours = this.calculateNightHours(scheduleData, day);
+
+            if (dayData.d1 && stats[dayData.d1]) {
+              stats[dayData.d1].d++;
+              stats[dayData.d1].totalHours += this.shiftHours["D"];
+            }
+            if (dayData.d2 && stats[dayData.d2]) {
+              stats[dayData.d2].d++;
+              stats[dayData.d2].totalHours += this.shiftHours["D"];
+            }
+            if (dayData.mdh && stats[dayData.mdh]) {
+              stats[dayData.mdh].mdh++;
+              stats[dayData.mdh].totalHours += this.shiftHours["MDH"];
+            }
+            if (dayData.md && stats[dayData.md]) {
+              stats[dayData.md].md++;
+              stats[dayData.md].totalHours += this.shiftHours["MD"];
+            }
+            if (dayData.n1 && stats[dayData.n1]) {
+              stats[dayData.n1].n++;
+              stats[dayData.n1].totalHours += nightHours;
+            }
+            if (dayData.n2 && stats[dayData.n2]) {
+              stats[dayData.n2].n++;
+              stats[dayData.n2].totalHours += nightHours;
+            }
           });
 
           staffList.forEach((staff) => {
@@ -1090,6 +1217,134 @@
           });
 
           return stats;
+        },
+
+        // 엑셀 파일에서 달력 형식 데이터 파싱
+        parseExcelScheduleData: function (excelData) {
+          console.log("📅 엑셀 달력 형식 데이터 파싱 시작...");
+          const parsedData = {};
+
+          // 엑셀 데이터가 달력 형식이라고 가정
+          // 각 날짜별로 3행의 데이터 (D, MDH/MD, N)
+
+          try {
+            // 날짜를 찾는 로직 (1~31 숫자 패턴)
+            for (let row = 0; row < excelData.length; row++) {
+              for (let col = 0; col < excelData[row].length; col++) {
+                const cellValue = excelData[row][col];
+
+                // 날짜인지 확인 (1~31)
+                if (
+                  cellValue &&
+                  !isNaN(cellValue) &&
+                  cellValue >= 1 &&
+                  cellValue <= 31
+                ) {
+                  const day = parseInt(cellValue);
+
+                  // 해당 날짜의 근무자 정보 추출 (날짜 아래 3행)
+                  const daySchedule = this.extractDayScheduleFromExcel(
+                    excelData,
+                    row,
+                    col,
+                    day
+                  );
+                  if (daySchedule) {
+                    parsedData[day] = daySchedule;
+                  }
+                }
+              }
+            }
+
+            console.log(
+              "✅ 엑셀 파싱 완료:",
+              Object.keys(parsedData).length,
+              "일"
+            );
+            return parsedData;
+          } catch (error) {
+            console.error("❌ 엑셀 파싱 오류:", error);
+            throw new Error(
+              "엑셀 파일 형식을 인식할 수 없습니다: " + error.message
+            );
+          }
+        },
+
+        extractDayScheduleFromExcel: function (excelData, row, col, day) {
+          try {
+            // 날짜 아래 3행의 데이터 추출
+            const line1 =
+              row + 1 < excelData.length ? excelData[row + 1][col] : null; // D 근무
+            const line2 =
+              row + 2 < excelData.length ? excelData[row + 2][col] : null; // MDH/MD 근무
+            const line3 =
+              row + 3 < excelData.length ? excelData[row + 3][col] : null; // N 근무
+
+            // 요일 계산 (임시로 7월 기준)
+            const date = new Date(2025, 6, day); // 2025년 7월
+            const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+            const dayOfWeek = dayNames[date.getDay()];
+
+            const schedule = {
+              date: `2025-07-${day.toString().padStart(2, "0")}`,
+              day: dayOfWeek,
+              d1: "",
+              d2: "",
+              mdh: "",
+              md: "",
+              n1: "",
+              n2: "",
+            };
+
+            // D 근무자 파싱 (/ 구분자로 2명 가능)
+            if (line1) {
+              const dWorkers = this.parseWorkerLine(line1.toString());
+              schedule.d1 = this.convertDoctorName(dWorkers[0] || "");
+              schedule.d2 = this.convertDoctorName(dWorkers[1] || "");
+            }
+
+            // MDH/MD 근무자 파싱
+            if (line2) {
+              const line2Str = line2.toString();
+              const parts = line2Str.split("/");
+
+              // MDH 근무자 ((H) 앞의 문자)
+              if (parts[0]) {
+                const mdhMatch = parts[0].match(/(.+?)\(H\)/);
+                if (mdhMatch) {
+                  schedule.mdh = this.convertDoctorName(mdhMatch[1].trim());
+                }
+              }
+
+              // MD 근무자 (/ 뒤의 문자)
+              if (parts[1]) {
+                schedule.md = this.convertDoctorName(parts[1].trim());
+              }
+            }
+
+            // N 근무자 파싱 (/ 구분자로 2명 가능)
+            if (line3) {
+              const nWorkers = this.parseWorkerLine(line3.toString());
+              schedule.n1 = this.convertDoctorName(nWorkers[0] || "");
+              schedule.n2 = this.convertDoctorName(nWorkers[1] || "");
+            }
+
+            return schedule;
+          } catch (error) {
+            console.warn(`⚠️ ${day}일 스케줄 파싱 오류:`, error);
+            return null;
+          }
+        },
+
+        parseWorkerLine: function (line) {
+          if (!line) return [];
+
+          // / 구분자로 분리
+          const workers = line
+            .split("/")
+            .map((w) => w.trim())
+            .filter((w) => w);
+          return workers;
         },
       };
 
@@ -1361,6 +1616,7 @@
 
       function initializeSystem() {
         initializeFileUpload();
+        initializeScheduleFileUpload();
       }
 
       function initializeFileUpload() {
@@ -1395,6 +1651,68 @@
         dropArea.addEventListener("click", function () {
           fileInput.click();
         });
+      }
+
+      function initializeScheduleFileUpload() {
+        const scheduleFileInput = document.getElementById("scheduleFileInput");
+        const scheduleDropArea = document.getElementById(
+          "scheduleFileDropArea"
+        );
+
+        scheduleFileInput.addEventListener("change", function (e) {
+          if (e.target.files.length > 0) {
+            handleScheduleFileUpload(e.target.files[0]);
+          }
+        });
+
+        scheduleDropArea.addEventListener("dragleave", function (e) {
+          e.preventDefault();
+          scheduleDropArea.classList.remove("drag-over");
+        });
+
+        scheduleDropArea.addEventListener("drop", function (e) {
+          e.preventDefault();
+          scheduleDropArea.classList.remove("drag-over");
+
+          if (e.dataTransfer.files.length > 0) {
+            handleScheduleFileUpload(e.dataTransfer.files[0]);
+          }
+        });
+
+        scheduleDropArea.addEventListener("click", function () {
+          scheduleFileInput.click();
+        });
+      }
+
+      async function handleScheduleFileUpload(file) {
+        if (!file.name.match(/\.(xlsx|xls)$/)) {
+          alert("엑셀 파일(.xlsx, .xls)만 업로드 가능합니다.");
+          return;
+        }
+
+        try {
+          console.log("📁 스케줄 파일 업로드 시작:", file.name);
+          showUploadProgress("스케줄 파일 읽는 중...", 25);
+
+          const rawData = await PatientAnalyzer.readExcelFile(file);
+          showUploadProgress("스케줄 데이터 파싱 중...", 50);
+
+          scheduleData = ScheduleManager.parseExcelScheduleData(rawData);
+          showUploadProgress("스케줄 변환 중...", 75);
+
+          displayScheduleTable();
+          showUploadProgress("완료!", 100);
+
+          setTimeout(() => {
+            hideUploadProgress();
+            document.getElementById("scheduleResults").style.display = "block";
+            alert("✅ 스케줄 데이터가 성공적으로 업로드되고 분석되었습니다!");
+          }, 500);
+        } catch (error) {
+          hideUploadProgress();
+          console.error("❌ 스케줄 파일 처리 오류:", error);
+          alert("스케줄 파일 처리 중 오류가 발생했습니다:\n\n" + error.message);
+        }
       }
 
       async function handlePatientFileUpload(file) {
@@ -2381,7 +2699,7 @@
             plugins: {
               title: {
                 display: true,
-                text: "의사별 총 근무시간 (D: 10h, MDH: 4h, MD: 9h, N: 14h)",
+                text: "의사별 총 근무시간 (D: 10h, MDH: 4h, MD: 9h, N: 14h/9h)",
                 font: { size: 16, weight: "600" },
                 color: "#1e293b",
                 padding: 20,
@@ -2480,7 +2798,162 @@
         });
       }
 
+      function generateDetailedWorkScheduleTable() {
+        if (!scheduleData || Object.keys(scheduleData).length === 0) {
+          alert("먼저 스케줄 데이터를 처리해주세요.");
+          return;
+        }
+
+        console.log("📊 상세 근무표 생성 중...");
+
+        const workloadStats =
+          ScheduleManager.calculateWorkloadStats(scheduleData);
+        const staffList = Object.keys(workloadStats).filter(
+          (staff) => workloadStats[staff].total > 0
+        );
+
+        // 상세 테이블 HTML 생성
+        const tableHtml = `
+          <div class="chart-container mt-4">
+            <div class="chart-header">
+              <h5><i class="fas fa-table"></i> 의사별 상세 근무 현황표</h5>
+              <button class="chart-save-btn" onclick="exportDetailedTableToExcel()">
+                <i class="fas fa-download"></i> 엑셀 저장
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover" id="detailedWorkTable">
+                <thead class="table-dark">
+                  <tr>
+                    <th rowspan="2" class="text-center align-middle">의사명</th>
+                    <th colspan="4" class="text-center">근무 횟수</th>
+                    <th rowspan="2" class="text-center align-middle">총 근무</th>
+                    <th rowspan="2" class="text-center align-middle">총 시간</th>
+                  </tr>
+                  <tr>
+                    <th class="text-center">D<br><small>(10h)</small></th>
+                    <th class="text-center">MDH<br><small>(4h)</small></th>
+                    <th class="text-center">MD<br><small>(9h)</small></th>
+                    <th class="text-center">N<br><small>(9~14h)</small></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${staffList
+                    .map((staff) => {
+                      const stats = workloadStats[staff];
+                      return `
+                      <tr>
+                        <td class="fw-bold text-center">${staff}</td>
+                        <td class="text-center">${stats.d}</td>
+                        <td class="text-center">${stats.mdh}</td>
+                        <td class="text-center">${stats.md}</td>
+                        <td class="text-center">${stats.n}</td>
+                        <td class="text-center fw-bold">${stats.total}</td>
+                        <td class="text-center fw-bold text-primary">${stats.totalHours}h</td>
+                      </tr>
+                    `;
+                    })
+                    .join("")}
+                </tbody>
+                <tfoot class="table-secondary">
+                  <tr>
+                    <td class="fw-bold text-center">합계</td>
+                    <td class="text-center fw-bold">${staffList.reduce(
+                      (sum, staff) => sum + workloadStats[staff].d,
+                      0
+                    )}</td>
+                    <td class="text-center fw-bold">${staffList.reduce(
+                      (sum, staff) => sum + workloadStats[staff].mdh,
+                      0
+                    )}</td>
+                    <td class="text-center fw-bold">${staffList.reduce(
+                      (sum, staff) => sum + workloadStats[staff].md,
+                      0
+                    )}</td>
+                    <td class="text-center fw-bold">${staffList.reduce(
+                      (sum, staff) => sum + workloadStats[staff].n,
+                      0
+                    )}</td>
+                    <td class="text-center fw-bold">${staffList.reduce(
+                      (sum, staff) => sum + workloadStats[staff].total,
+                      0
+                    )}</td>
+                    <td class="text-center fw-bold text-primary">${staffList.reduce(
+                      (sum, staff) => sum + workloadStats[staff].totalHours,
+                      0
+                    )}h</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            
+            <!-- 요약 통계 -->
+            <div class="row mt-3">
+              <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                  <div class="card-body text-center">
+                    <h5>${staffList.length}</h5>
+                    <small>총 의사 수</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-success text-white">
+                  <div class="card-body text-center">
+                    <h5>${Math.round(
+                      staffList.reduce(
+                        (sum, staff) => sum + workloadStats[staff].totalHours,
+                        0
+                      ) / staffList.length
+                    )}h</h5>
+                    <small>평균 근무시간</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-info text-white">
+                  <div class="card-body text-center">
+                    <h5>${Math.round(
+                      staffList.reduce(
+                        (sum, staff) => sum + workloadStats[staff].total,
+                        0
+                      ) / staffList.length
+                    )}</h5>
+                    <small>평균 근무 횟수</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const container = document.getElementById("scheduleChartsContainer");
+        container.innerHTML = tableHtml;
+
+        console.log("✅ 상세 근무표 생성 완료");
+      }
+
+      function exportDetailedTableToExcel() {
+        try {
+          const table = document.getElementById("detailedWorkTable");
+          const wb = XLSX.utils.table_to_book(table, {
+            sheet: "의사별상세근무현황",
+          });
+          XLSX.writeFile(
+            wb,
+            `의사별_상세근무현황_${new Date().toISOString().slice(0, 10)}.xlsx`
+          );
+          console.log("✅ 엑셀 파일 저장 완료");
+        } catch (error) {
+          console.error("❌ 엑셀 저장 오류:", error);
+          alert("엑셀 저장 중 오류가 발생했습니다: " + error.message);
+        }
+      }
+
       console.log("🏥 응급실 통합 모니터링 시스템 로드 완료");
     </script>
   </body>
 </html>
+dragover', function(e) { e.preventDefault();
+scheduleDropArea.classList.add('drag-over'); });
+scheduleDropArea.addEventListener('
